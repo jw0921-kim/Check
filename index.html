@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📊 출석부 대시보드</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 30px;
+    }
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+    button {
+      padding: 14px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background-color: #42a5f5;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #1e88e5;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 출석부 대시보드</h1>
+  <div class="button-container">
+    <button onclick="location.href='attendance_firebase_gyeomsonbu_scoped.html'">겸손부 출석부</button>
+    <button onclick="location.href='attendance_firebase_onyubu_scoped.html'">온유부 출석부</button>
+    <button onclick="location.href='attendance_firebase_sarangbu_scoped.html'">사랑부 출석부</button>
+  </div>
+</body>
+</html>

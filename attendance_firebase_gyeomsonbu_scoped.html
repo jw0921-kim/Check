@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>출석부 Firebase 연동</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 8px; }
+    h1 { text-align: center; margin-bottom: 5px; }
+    .top-controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
+    .top-controls button { font-size: 16px; padding: 6px 12px; background: #90caf9; border: none; color: white; border-radius: 4px; cursor: pointer; }
+    .top-controls input { font-size: 16px; padding: 6px; width: 140px; text-align: center; border-radius: 4px; border: 1px solid #ccc; }
+    .summary { text-align: center; font-weight: bold; margin: 10px 0 20px; }
+    .group-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+    .group { flex: 1; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); max-width: 400px; }
+    .group h2 { text-align: center; margin-bottom: 10px; }
+    .group h2 span { font-size: 0.9rem; color: #555; margin-left: 6px; }
+    .names { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .name { padding: 8px; text-align: center; border-radius: 6px; background: #eceff1; cursor: pointer; transition: background 0.2s; }
+    .name.present { background: #c8e6c9; }
+    .toast {
+      position: fixed; bottom: 60px; right: 20px;
+      background: rgba(0,0,0,0.8); color: white;
+      padding: 8px 12px; border-radius: 4px;
+      opacity: 0; transition: opacity 0.5s ease; font-size: 0.9rem;
+    }
+    .toast.show { opacity: 1; }
+    #copyBtn {
+      position: fixed; bottom: 20px; right: 20px;
+      padding: 8px 12px; background: #4caf50; color: white;
+      border: none; border-radius: 4px; cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+  <h1>📋 출석부</h1>
+  <div class="top-controls">
+    <button id="prevDay">◀</button>
+    <input type="text" id="datePicker" />
+    <button id="nextDay">▶</button>
+  </div>
+  <div class="summary" id="summary">총 출석: 0명</div>
+  <div class="group-container">
+    <div class="group">
+      <h2>형제 <span id="broCount"></span></h2>
+      <div class="names" id="brothers"></div>
+    </div>
+    <div class="group">
+      <h2>자매 <span id="sisCount"></span></h2>
+      <div class="names" id="sisters"></div>
+    </div>
+  </div>
+  <button id="copyBtn">복사</button>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDrHDHrYO2Z8tWmWRgWYcN4nWHwALZ4c0s",
+      authDomain: "attendance-6b1b6.firebaseapp.com",
+      databaseURL: "https://attendance-6b1b6-default-rtdb.firebaseio.com",
+      projectId: "attendance-6b1b6",
+      storageBucket: "attendance-6b1b6.firebasestorage.app",
+      messagingSenderId: "808077953334",
+      appId: "1:808077953334:web:238afede21744aee6f8b97",
+      measurementId: "G-FZT4B2JQXH"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const brothers = ["이태섭", "김진우", "이동환", "김지석", "전도영", "김권비", "김민호", "남준혁", "최재혁", "김인수", "문지훈", "전호성", "박지웅", "김두현", "박효원"];
+    const sisters = ["전효진", "고다영", "남소연", "김유나", "정여진", "심규리", "김민서", "박지혜", "심재경", "유지연", "심예림", "이소희", "임도해", "이현화", "김소은", "김이안"];
+    let currentDate = new Date().toISOString().split("T")[0];
+
+    const datePicker = document.getElementById("datePicker");
+    const summary = document.getElementById("summary");
+    const broCountEl = document.getElementById("broCount");
+    const sisCountEl = document.getElementById("sisCount");
+    const brothersDiv = document.getElementById("brothers");
+    const sistersDiv = document.getElementById("sisters");
+
+    function createTag(name, group) {
+      const div = document.createElement("div");
+      div.className = "name";
+      div.textContent = name;
+      div.onclick = () => {
+        div.classList.toggle("present");
+        saveToFirebase();
+        updateSummary();
+      };
+      return div;
+    }
+
+    function render() {
+      brothersDiv.innerHTML = "";
+      sistersDiv.innerHTML = "";
+      brothers.forEach(name => brothersDiv.appendChild(createTag(name, "brother")));
+      sisters.forEach(name => sistersDiv.appendChild(createTag(name, "sister")));
+    }
+
+    function updateSummary() {
+      const b = [...brothersDiv.children].filter(c => c.classList.contains("present")).length;
+      const s = [...sistersDiv.children].filter(c => c.classList.contains("present")).length;
+      summary.textContent = `총 출석: ${b + s}명`;
+      broCountEl.textContent = b ? `${b}명` : "";
+      sisCountEl.textContent = s ? `${s}명` : "";
+    }
+
+    function saveToFirebase() {
+      const bro = brothers.map((name, i) => brothersDiv.children[i].classList.contains("present"));
+      const sis = sisters.map((name, i) => sistersDiv.children[i].classList.contains("present"));
+      db.ref("attendance/겸손부/" + currentDate).set({ 형제: bro, 자매: sis });
+    }
+
+    function loadFromFirebase() {
+      render();
+      db.ref("attendance/겸손부/" + currentDate).get().then(snap => {
+        if (!snap.exists()) return updateSummary();
+        const data = snap.val();
+        if (data.형제) data.형제.forEach((v,i) => brothersDiv.children[i]?.classList.toggle("present", v));
+        if (data.자매) data.자매.forEach((v,i) => sistersDiv.children[i]?.classList.toggle("present", v));
+        updateSummary();
+      });
+    }
+
+    function showToast(message) {
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.classList.add("show"), 10);
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => document.body.removeChild(toast), 500);
+      }, 2000);
+    }
+
+    document.getElementById("copyBtn").onclick = () => {
+      const yy = currentDate.slice(2,4), mm = currentDate.slice(5,7), dd = currentDate.slice(8,10);
+      const wd = ['일','월','화','수','목','금','토'][new Date(currentDate).getDay()];
+      const bro = [...brothersDiv.children].filter(c => c.classList.contains("present")).map(c => c.textContent);
+      const sis = [...sistersDiv.children].filter(c => c.classList.contains("present")).map(c => c.textContent);
+      const lines = [`${yy}.${mm}.${dd}(${wd}) 겸손부 총 ${bro.length + sis.length}명`];
+      lines.push(`형제님 ${bro.length}명`);
+      for (let i=0; i<bro.length; i+=5) lines.push(bro.slice(i,i+5).join(" "));
+      lines.push(``, `자매님 ${sis.length}명`);
+      for (let i=0; i<sis.length; i+=5) lines.push(sis.slice(i,i+5).join(" "));
+      navigator.clipboard.writeText(lines.join("\n")).then(() => showToast("출석 현황 복사됨!"));
+    };
+
+    function changeDate(offset) {
+      const d = new Date(currentDate);
+      d.setDate(d.getDate() + offset);
+      currentDate = d.toISOString().split("T")[0];
+      datePicker._flatpickr.setDate(currentDate, true);
+      loadFromFirebase();
+    }
+
+    document.getElementById("prevDay").onclick = () => changeDate(-1);
+    document.getElementById("nextDay").onclick = () => changeDate(1);
+
+    flatpickr(datePicker, {
+      locale: "ko",
+      dateFormat: "Y-m-d",
+      defaultDate: currentDate,
+      onChange: (_, dateStr) => {
+        currentDate = dateStr;
+        loadFromFirebase();
+      },
+      onDayCreate: function(_,__,___,el) {
+        const d = new Date(el.dateObj.getTime() - el.dateObj.getTimezoneOffset()*60000);
+        const k = d.toISOString().split("T")[0];
+        db.ref("attendance/" + k).get().then(s => {
+          if (s.exists()) el.classList.add("attendance-day");
+        });
+      }
+    });
+
+    loadFromFirebase();
+  </script>
+</body>
+</html>
