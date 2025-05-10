@@ -313,6 +313,31 @@
     }
 
     
+    function listenToFirebase() {
+      db.ref("attendance/겸손부/" + currentDate).on("value", snap => {
+        if (!snap.exists()) return updateSummary();
+        const data = snap.val();
+        brothers.forEach((_, i) => {
+          brothersDiv.children[i]?.classList.toggle("present", !!data.형제?.[i]);
+        });
+        sisters.forEach((_, i) => {
+          sistersDiv.children[i]?.classList.toggle("present", !!data.자매?.[i]);
+        });
+        updateSummary();
+      });
+    }
+
+function loadFromFirebase() {
+      render();
+      db.ref("attendance/겸손부/" + currentDate).get().then(snap => {
+        if (!snap.exists()) return updateSummary();
+        const data = snap.val();
+        if (data.형제) data.형제.forEach((v,i) => brothersDiv.children[i]?.classList.toggle("present", v));
+        if (data.자매) data.자매.forEach((v,i) => sistersDiv.children[i]?.classList.toggle("present", v));
+        updateSummary();
+      });
+    }
+
     function showToast(message) {
       const toast = document.createElement("div");
       toast.className = "toast";
@@ -363,11 +388,13 @@
     };
 
     function changeDate(offset) {
+      db.ref("attendance/겸손부/" + currentDate).off();
       const d = new Date(currentDate);
       d.setDate(d.getDate() + offset);
       currentDate = d.toISOString().split("T")[0];
       datePicker._flatpickr.setDate(currentDate, true);
-      render(); enableRealtimeSync();
+      render();
+    listenToFirebase();
     }
 
     flatpickr(datePicker, {
@@ -375,8 +402,12 @@
       dateFormat: "Y-m-d",
       defaultDate: currentDate,
       onChange: (_, dateStr) => {
+        db.ref("attendance/겸손부/" + currentDate).off();
+        render();
+        
         currentDate = dateStr;
-        render(); enableRealtimeSync();
+        render();
+    listenToFirebase();
       },
       onDayCreate: function(_,__,___,el) {
         const d = new Date(el.dateObj.getTime() - el.dateObj.getTimezoneOffset()*60000);
@@ -387,7 +418,8 @@
       }
     });
 
-    render(); enableRealtimeSync();
+    render();
+    listenToFirebase();
   </script>
 </body>
 </html>
