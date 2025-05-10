@@ -94,31 +94,7 @@
       font-weight: bold;
     }
   </style>
-<style>
-#datePicker {
-  height: 13px !important;
-  width: 60px !important;
-  font-size: 11px !important;
-  line-height: 13px !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border: none !important;
-  text-align: center !important;
-  box-sizing: border-box !important;
-  display: inline-block !important;
-  vertical-align: middle !important;
-}
-</style>
-
-
-
-
-
-
-
-
-<style>
-#datePicker {
+<style>#datePicker {
   height: 26px !important;
   width: 80px !important;
   font-size: 15px !important;
@@ -137,9 +113,20 @@
   line-height: 26px !important;
   padding: 0 4px !important;
   margin: 0 !important;
+}</style><style>
+a.panel-link {
+  text-decoration: none;
+  color: inherit;
 }
-</style>
-</head>
+.panel-link .panel {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.panel-link:active .panel,
+.panel:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+</style></head>
 <body>
 <button onclick="history.back()" style="position: absolute; top: 10px; left: 10px; background: #f3f7ff; color: #37474f;
     border: 1px solid #cfd8dc; padding: 6px 12px; font-size: 13px; border-radius: 6px; cursor: pointer;
@@ -191,11 +178,20 @@
     const dashboard = document.getElementById("dashboard");
     let selectedDate = new Date().toISOString().split("T")[0];
 
+    
     function renderAll() {
       dashboard.innerHTML = ""; // Clear all panels first
       departments.forEach(dep => {
-        const panel = document.createElement("div");
-        panel.className = "panel";
+        
+      const panelLink = document.createElement("a");
+      panelLink.className = "panel-link";
+
+      if (dep.name === "겸손부") panelLink.href = "attendance_firebase_gyeomsonbu_scoped.html";
+      else if (dep.name === "온유부") panelLink.href = "attendance_firebase_onuybu_scoped.html";
+      else if (dep.name === "사랑부") panelLink.href = "attendance_firebase_sarangbu_scoped.html";
+
+      const panel = document.createElement("div");
+      panel.className = "panel";
         panel.innerHTML = `
           <h2>${dep.name} <span id="${dep.name}_total" style="font-size: 13px; color: #666;"></span></h2>
           
@@ -209,45 +205,66 @@
               <div class="names" id="${dep.name}_siss"></div>
             </div>
           </div>
-
         `;
-        dashboard.appendChild(panel);
+        panelLink.appendChild(panel);
+        dashboard.appendChild(panelLink);
 
-        db.ref("attendance/" + dep.name + "/" + selectedDate).get().then(snap => {
-          const brosDiv = document.getElementById(dep.name + "_bros");
-          const sissDiv = document.getElementById(dep.name + "_siss");
-          
+        const brosDiv = document.getElementById(dep.name + "_bros");
+        const sissDiv = document.getElementById(dep.name + "_siss");
+
+        const ref = db.ref("attendance/" + dep.name + "/" + selectedDate);
+        ref.off();
+        ref.on("value", snap => {
           let broCount = 0;
           let sisCount = 0;
 
           brosDiv.innerHTML = "";
-dep.brothers.forEach((name, i) => {
-
+          dep.brothers.forEach((name, i) => {
             const div = document.createElement("div");
             div.className = "name";
             div.textContent = name;
             if (snap.exists() && snap.val().형제?.[i]) { div.classList.add("present"); broCount++; }
             brosDiv.appendChild(div);
           });
+
           sissDiv.innerHTML = "";
-dep.sisters.forEach((name, i) => {
+          dep.sisters.forEach((name, i) => {
             const div = document.createElement("div");
             div.className = "name";
             div.textContent = name;
             if (snap.exists() && snap.val().자매?.[i]) { div.classList.add("present"); sisCount++; }
             sissDiv.appendChild(div);
+          });
+
           document.querySelector(`#${dep.name}_bros`).previousElementSibling.querySelector('.count').textContent = `${broCount}명`;
           document.querySelector(`#${dep.name}_siss`).previousElementSibling.querySelector('.count').textContent = `${sisCount}명`;
-
-          const totalCount = broCount + sisCount;
           const totalSpan = document.getElementById(`${dep.name}_total`);
-          if (totalSpan) totalSpan.textContent = `총 ${totalCount}명`;
+          if (totalSpan) totalSpan.textContent = `총 ${broCount + sisCount}명`;
 
-          });
+          updateTotalSummary();
         });
       });
     }
 
+    function updateTotalSummary() {
+      let totalBro = 0;
+      let totalSis = 0;
+
+      departments.forEach(dep => {
+        const ref = db.ref("attendance/" + dep.name + "/" + selectedDate);
+        ref.get().then(snap => {
+          const bros = snap.val()?.형제 || [];
+          const siss = snap.val()?.자매 || [];
+          totalBro += bros.filter(x => x).length;
+          totalSis += siss.filter(x => x).length;
+
+          if (dep.name === "사랑부") {
+            const total = totalBro + totalSis;
+            document.getElementById("totalSummary").textContent = `출석 총 ${total}명 (형제님 ${totalBro}명, 자매님 ${totalSis}명)`;
+          }
+        });
+      });
+    }
     flatpickr("#datePicker", {
       locale: "ko",
       dateFormat: "Y-m-d",
