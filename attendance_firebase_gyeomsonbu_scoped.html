@@ -1,86 +1,175 @@
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>출석부 Firebase 연동</title>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
-  <style>
-    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 8px; }
-    h1 { text-align: center; margin-bottom: 5px; }
-    .top-controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>출석부 Firebase 연동</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+<style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e3f2fd 0%, #fff0f5 100%);
+      margin: 0;
+      padding: 16px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: 1.4rem;
+      color: #555;
+    }
+
+    .top-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
     .top-controls button {
-      font-size: 16px;
-      padding: 6px 12px;
-      background: #607d8b;
+      font-size: 14px;
+      padding: 6px 10px;
+      background: #f1fafe;
       border: none;
-      color: white;
-      border-radius: 4px;
+      color: #004d40;
+      border-radius: 6px;
       cursor: pointer;
     }
+
     .top-controls input {
-      font-size: 16px;
+      font-size: 14px;
       padding: 6px;
-      width: 140px;
+      width: 130px;
       text-align: center;
-      border-radius: 4px;
+      border-radius: 6px;
       border: 1px solid #ccc;
     }
-    .summary { text-align: center; font-weight: bold; margin: 10px 0 20px; }
-    .group-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
-    .group {
-      flex: 1;
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      max-width: 400px;
+
+    .summary {
+      text-align: center;
+      font-weight: 600;
+      margin: 10px 0 18px;
+      font-size: 0.95rem;
     }
-    .group h2 { text-align: center; margin-bottom: 10px; }
-    .group h2 span { font-size: 0.9rem; color: #555; margin-left: 6px; }
+
+    .group-container {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .group {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      max-width: 360px;
+      flex: 1;
+    }
+
+    .group h2 {
+      text-align: center;
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+      color: #666;
+    }
+
+    .group h2 span {
+      font-size: 0.85rem;
+      color: #999;
+      margin-left: 6px;
+    }
+
     .names {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
+      gap: 8px;
     }
+
+    #brothers { background: linear-gradient(to bottom, #e3f2fd, #ffffff); border-radius: 14px; padding: 12px; }
+#brothers .name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 6px 4px;
+      background: #e3f2fd;
+      color: #0d47a1;
+      border: 1px solid #bbdefb;
+    }
+
+    #sisters { background: linear-gradient(to bottom, #fce4ec, #ffffff); border-radius: 14px; padding: 12px; }
+#sisters .name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 6px 4px;
+      background: #fce4ec;
+      color: #880e4f;
+      border: 1px solid #f8bbd0;
+    }
+
     .name {
-      padding: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 6px 4px;
+      padding: 7px;
       text-align: center;
-      border-radius: 6px;
-      background: #eceff1;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
     }
-    .name.present { background: #c8e6c9; }
+
+    .name.present {
+  transform: scale(1.03);
+  transition: transform 0.2s ease;
+  color: #2e7d32 !important;
+      background: #e6f4ea !important;
+      border: 2px solid #aed581;
+      font-weight: bold;
+      color: #33691e;
+    }
+
     .toast {
       position: fixed;
       bottom: 60px;
       right: 20px;
-      background: rgba(0,0,0,0.8);
-      color: white;
+      background: rgba(0,0,0,0.75);
+      color: #fff;
       padding: 8px 12px;
       border-radius: 4px;
       opacity: 0;
       transition: opacity 0.5s ease;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
-    .toast.show { opacity: 1; }
+
+    .toast.show {
+      opacity: 1;
+    }
+
     #copyBtn {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      padding: 8px 12px;
-      background: #607d8b;
-      color: white;
+      padding: 8px 14px;
+      background: #fceefc;
+      color: #4a148c;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
+
     .bottom-controls {
       position: fixed;
       bottom: 20px;
@@ -88,47 +177,45 @@
       display: flex;
       gap: 10px;
     }
+
     .bottom-controls button {
-      background: #607d8b;
+      background: #fff3e0;
       padding: 8px 12px;
-      font-size: 14px;
-      color: white;
+      font-size: 13px;
+      color: #6d4c41;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
       box-sizing: border-box;
     }
-  </style>
+    </style>
 </head>
 <body>
-  <h1>📋 겸손부</h1>
-  <div class="top-controls">
-    <button id="prevDay">◀</button>
-    <input type="text" id="datePicker" />
-    <button id="nextDay">▶</button>
-  </div>
-  <div class="summary" id="summary">총 출석: 0명</div>
-  <div class="group-container">
-    <div class="group">
-      <h2>형제 <span id="broCount"></span></h2>
-      <div class="names" id="brothers"></div>
-    </div>
-    <div class="group">
-      <h2>자매 <span id="sisCount"></span></h2>
-      <div class="names" id="sisters"></div>
-    </div>
-  </div>
-
-  <div class="bottom-controls">
-    <button id="clearAllBtn">전체 선택 해제</button>
-    <button id="undoBtn">되돌리기</button>
-    <button id="redoBtn">다시 실행</button>
-  </div>
-
-  <button id="copyBtn">복사</button>
-
-  <script>
+<h1>📋 겸손부</h1>
+<div class="top-controls">
+<button id="prevDay">◀</button>
+<input id="datePicker" type="text"/>
+<button id="nextDay">▶</button>
+</div>
+<div class="summary" id="summary">총 출석: 0명</div>
+<div class="group-container">
+<div class="group">
+<h2>형제 <span id="broCount"></span></h2>
+<div class="names" id="brothers"></div>
+</div>
+<div class="group">
+<h2>자매 <span id="sisCount"></span></h2>
+<div class="names" id="sisters"></div>
+</div>
+</div>
+<div class="bottom-controls">
+<button id="clearAllBtn">전체 선택 해제</button>
+<button id="undoBtn">되돌리기</button>
+<button id="redoBtn">다시 실행</button>
+</div>
+<button id="copyBtn">복사</button>
+<script>
     const firebaseConfig = {
       apiKey: "AIzaSyDrHDHrYO2Z8tWmWRgWYcN4nWHwALZ4c0s",
       authDomain: "attendance-6b1b6.firebaseapp.com",
