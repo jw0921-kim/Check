@@ -1,16 +1,17 @@
 
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>전체 출석 현황 보기</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>전체 출석 현황 보기</title>
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<style>
     body {
       margin: 0;
       padding: 8px;
@@ -93,36 +94,70 @@
       font-weight: bold;
     }
   </style>
+<style>
+#datePicker {
+  height: 13px !important;
+  width: 60px !important;
+  font-size: 11px !important;
+  line-height: 13px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+</style>
+
+
+
+
+
+
+
+
+<style>
+#datePicker {
+  height: 26px !important;
+  width: 80px !important;
+  font-size: 15px !important;
+  line-height: 26px !important;
+  padding: 0 4px !important;
+  margin: 0 !important;
+  border: none !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+.flatpickr-input {
+  height: 26px !important;
+  font-size: 15px !important;
+  line-height: 26px !important;
+  padding: 0 4px !important;
+  margin: 0 !important;
+}
+</style>
 </head>
 <body>
-
-  <button onclick="history.back()" style="position: absolute; top: 10px; left: 10px; background: #f3f7ff; color: #37474f;
+<button onclick="history.back()" style="position: absolute; top: 10px; left: 10px; background: #f3f7ff; color: #37474f;
     border: 1px solid #cfd8dc; padding: 6px 12px; font-size: 13px; border-radius: 6px; cursor: pointer;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);">←</button>
-
-    
-    <div class="date-picker" style="display: flex; align-items: baseline; justify-content: center; align-items: center; gap: 8px;">
-      <button id="prevDay" style="padding: 4px 6px; font-size: 12px;">◀</button>
-
-          <input id="datePicker" style="width: 30px; font-size: 11px; padding: 1px;" type="text" />
-        <button id="nextDay" style="padding: 4px 6px; font-size: 12px;">▶</button>
-    </div>
-    
-    
-    
-    <div style="display: flex; justify-content: center; position: relative; font-size: 20px; font-weight: bold; margin-top: 4px;">
+<div class="date-picker" style="display: flex; align-items: baseline; justify-content: center; align-items: center; gap: 8px;">
+<button id="prevDay" style="padding: 4px 6px; font-size: 12px;">◀</button>
+<input id="datePicker" style="width: 30px; font-size: 11px; padding: 1px;" type="text"/>
+<button id="nextDay" style="padding: 4px 6px; font-size: 12px;">▶</button>
+</div>
+<div style="display: flex; justify-content: center; position: relative; font-size: 20px; font-weight: bold; margin-top: 4px;">
       전체출석현황
       <div style="position: absolute; right: 1px; top: 2px; right: 0; text-align: right; font-size: 13px; font-weight: normal;"> </div>
-    </div>
-    
-    <div style="text-align: right; font-size: 13px; color: #555; margin: 2px 4px 6px 0; " id="totalSummary"></div>
-    
-    
-  <div class="dashboard" id="dashboard">
-    <!-- Panels inserted by JS -->
-  </div>
-
-  <script>
+</div>
+<div id="totalSummary" style="text-align: right; font-size: 13px; color: #555; margin: 2px 4px 6px 0; "></div>
+<div class="dashboard" id="dashboard">
+<!-- Panels inserted by JS -->
+</div>
+<script>
     const firebaseConfig = {
       apiKey: "AIzaSyDrHDHrYO2Z8tWmWRgWYcN4nWHwALZ4c0s",
       authDomain: "attendance-6b1b6.firebaseapp.com",
