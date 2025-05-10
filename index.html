@@ -1,6 +1,33 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+  <style>
+    ::placeholder {
+      color: #aaa;
+    }
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #121212;
+        color: #f0f0f0;
+      }
+      button {
+        background: linear-gradient(135deg, #4a90e2, #357ab8);
+        color: white;
+      }
+      input, textarea {
+        background: #1e1e1e;
+        color: #fff;
+        border-color: #444;
+      }
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>📋동탄교회 청년회 출석부🩵</title>
@@ -84,10 +111,12 @@ function toggleGuestbook() {
   <div id="guestbookContainer" style="display:none; width: 100%; max-width: 400px; margin-top: 20px;">
     <h2 style="color: #37474f; font-size: 20px; margin-bottom: 10px;">방명록입니다~</h2>
   <div style="width: 100%; max-width: 400px;">
-    <input id="guestName" type="text" placeholder="작성자 이름" style="width:100%; padding:10px; margin-bottom:8px; border-radius:10px; border:1px solid #ccc;" />
-    <textarea id="guestMessage" placeholder="방명록 내용을 입력하세요" style="width:100%; height:80px; padding:10px; border-radius:10px; border:1px solid #ccc;"></textarea>
-    <input id="guestPassword" type="password" placeholder="비밀번호 입력" style="width:100%; padding:10px; margin-bottom:8px; border-radius:10px; border:1px solid #ccc;" />
-    <button onclick="leaveMessage()" style="margin-top:10px; background: linear-gradient(135deg, #f48fb1, #f06292); color:white;">남기기</button>
+    <div style="display: flex; flex-direction: column; gap: 10px; width: 95%; max-width: 320px;">
+      <input id="guestName" type="text" placeholder="작성자 이름" style="padding:10px; font-size: 15px; border-radius:8px; border:1px solid #ccc;" />
+      <textarea id="guestMessage" placeholder="방명록 내용을 입력하세요" style="height:80px; padding:10px; font-size: 15px; border-radius:8px; border:1px solid #ccc; resize: vertical;"></textarea>
+      <input id="guestPassword" type="password" placeholder="비밀번호 입력" style="padding:10px; font-size: 15px; border-radius:8px; border:1px solid #ccc;" />
+    </div>
+    <button onclick="leaveMessage()" style="margin-top:10px; background: linear-gradient(135deg, #f48fb1, #f06292); color:white; border:none; border-radius:10px; font-weight:500;">남기기</button>
     <ul id="guestbook" style="list-style:none; padding:0; margin-top:20px;"></ul></div>
   </div>
 
@@ -108,11 +137,16 @@ function toggleGuestbook() {
     const masterPassword = "qpqp1010";
 
     function leaveMessage() {
+    const message = document.getElementById('guestMessage').value;
+    if (message.length > 300) {
+      alert("내용은 300자 이내로 입력해주세요.");
+      return;
+    }
       const name = document.getElementById('guestName').value.trim();
       const message = document.getElementById('guestMessage').value.trim();
       const password = document.getElementById('guestPassword').value.trim();
 
-      if (name && message) {
+      if (name && message && password) {
         const newEntry = {
           name,
           text: message,
@@ -132,13 +166,13 @@ function toggleGuestbook() {
       const data = snapshot.val();
       const li = document.createElement("li");
       const date = new Date(data.timestamp);
-    const formattedDate = date.toLocaleString("ko-KR", { dateStyle: "short", timeStyle: "short", weekday: "short" });
-    li.innerHTML = `
+    const formattedDate = date.toLocaleString("ko-KR", { month: "numeric", day: "numeric", weekday: "short", hour: "numeric", minute: "2-digit" });
+    li.classList.add("fade-in"); li.innerHTML = `
     <div style="white-space: pre-wrap; word-break: break-word;">
       <strong>작성자:</strong> ${data.name}<br/>
       <strong>내용:</strong> ${data.text}<br/>
       <span style="font-size: 13px; color: #777;">(${formattedDate} 작성)</span>
-      <button onclick="deleteMessage('${snapshot.key}', '${data.password}')" style="margin-left: 8px;">삭제</button>
+      <button onclick="deleteMessage('${snapshot.key}', '${data.password}')" style="float: right; font-size: 13px; background: none; color: #f06292; border: none; cursor: pointer;">삭제</button>
     </div>`;
       li.style.padding = '10px 0';
       li.style.marginBottom = '4px';
