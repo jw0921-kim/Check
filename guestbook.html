@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>방명록</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fafafa;
+      padding: 24px;
+      max-width: 700px;
+      margin: auto;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    form, .entry {
+      border-bottom: 1px solid #ddd;
+      padding: 16px 0;
+    }
+    input, textarea {
+      width: 100%;
+      margin: 6px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+    button {
+      padding: 10px 16px;
+      margin-top: 6px;
+      border: none;
+      border-radius: 8px;
+      background: #64b5f6;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #42a5f5;
+    }
+    .entry-meta {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    .controls input {
+      width: auto;
+      margin-right: 6px;
+    }
+    .forgot {
+      text-align: right;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+    .forgot button {
+      background: transparent;
+      color: #1976d2;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <h2>방명록</h2>
+
+  <form onsubmit="submitEntry(event)">
+    <input type="text" id="name" placeholder="이름" required />
+    <textarea id="message" placeholder="내용을 입력하세요" required></textarea>
+    <input type="password" id="password" placeholder="비밀번호 (삭제/수정용)" required />
+    <button type="submit">작성</button>
+  </form>
+
+  <div class="forgot">
+    <button onclick="alert('비밀번호를 잊으셨다면 관리자에게 문의해주세요: 010-1234-5678')">
+      비밀번호를 잊으셨나요?
+    </button>
+  </div>
+
+  <div id="entries"></div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDE0261NNnULm2qta3Zs21wGqKGLXergCM",
+      authDomain: "attendance-6b1b6.firebaseapp.com",
+      databaseURL: "https://attendance-6b1b6-default-rtdb.firebaseio.com",
+      projectId: "attendance-6b1b6",
+      storageBucket: "attendance-6b1b6.appspot.com",
+      messagingSenderId: "609694001919",
+      appId: "1:609694001919:web:c9f1cf0d34e44711"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database().ref('guestbook');
+
+    function submitEntry(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const password = document.getElementById('password').value;
+      if (!name || !message || !password) return;
+      db.push({ name, message, password, timestamp: Date.now() });
+      e.target.reset();
+    }
+
+    db.orderByChild("timestamp").on("value", snapshot => {
+      const container = document.getElementById("entries");
+      container.innerHTML = "";
+      const data = snapshot.val();
+      if (!data) return;
+      const keys = Object.keys(data).reverse();
+      keys.forEach(key => {
+        const { name, message, timestamp } = data[key];
+        const time = new Date(timestamp).toLocaleString("ko-KR");
+        const div = document.createElement("div");
+        div.className = "entry";
+        div.innerHTML = `
+          <div class="entry-meta">${time} | <strong>${name}</strong></div>
+          <div class="entry-text" id="text-${key}">${message}</div>
+          <div class="controls">
+            <input type="password" id="pass-${key}" placeholder="비밀번호 입력" />
+            <button onclick="editEntry('${key}')">수정</button>
+            <button onclick="deleteEntry('${key}')">삭제</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    });
+
+    function deleteEntry(key) {
+      const input = document.getElementById(`pass-${key}`);
+      db.child(key).once("value").then(snapshot => {
+        const savedPass = snapshot.val().password;
+        if (input.value === savedPass || input.value === "qpqp1010") {
+          db.child(key).remove();
+        } else {
+          alert("비밀번호가 일치하지 않습니다.");
+        }
+      });
+    }
+
+    function editEntry(key) {
+      const input = document.getElementById(`pass-${key}`);
+      db.child(key).once("value").then(snapshot => {
+        const saved = snapshot.val();
+        if (input.value === saved.password || input.value === "qpqp1010") {
+          const newMsg = prompt("수정할 내용을 입력하세요:", saved.message);
+          if (newMsg !== null && newMsg.trim() !== "") {
+            db.child(key).update({ message: newMsg });
+          }
+        } else {
+          alert("비밀번호가 일치하지 않습니다.");
+        }
+      });
+    }
+  </script>
+</body>
+</html>
