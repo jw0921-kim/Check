@@ -13,27 +13,72 @@
     body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 8px; }
     h1 { text-align: center; margin-bottom: 5px; }
     .top-controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
-    .top-controls button { font-size: 16px; padding: 6px 12px; background: #90caf9; border: none; color: white; border-radius: 4px; cursor: pointer; }
-    .top-controls input { font-size: 16px; padding: 6px; width: 140px; text-align: center; border-radius: 4px; border: 1px solid #ccc; }
+    .top-controls button {
+      font-size: 16px;
+      padding: 6px 12px;
+      background: #607d8b;
+      border: none;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .top-controls input {
+      font-size: 16px;
+      padding: 6px;
+      width: 140px;
+      text-align: center;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
     .summary { text-align: center; font-weight: bold; margin: 10px 0 20px; }
     .group-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
-    .group { flex: 1; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); max-width: 400px; }
+    .group {
+      flex: 1;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      max-width: 400px;
+    }
     .group h2 { text-align: center; margin-bottom: 10px; }
     .group h2 span { font-size: 0.9rem; color: #555; margin-left: 6px; }
-    .names { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .name { padding: 8px; text-align: center; border-radius: 6px; background: #eceff1; cursor: pointer; transition: background 0.2s; }
+    .names {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .name {
+      padding: 8px;
+      text-align: center;
+      border-radius: 6px;
+      background: #eceff1;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
     .name.present { background: #c8e6c9; }
     .toast {
-      position: fixed; bottom: 60px; right: 20px;
-      background: rgba(0,0,0,0.8); color: white;
-      padding: 8px 12px; border-radius: 4px;
-      opacity: 0; transition: opacity 0.5s ease; font-size: 0.9rem;
+      position: fixed;
+      bottom: 60px;
+      right: 20px;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      font-size: 0.9rem;
     }
     .toast.show { opacity: 1; }
     #copyBtn {
-      position: fixed; bottom: 20px; right: 20px;
-      padding: 8px 12px; background: #4caf50; color: white;
-      border: none; border-radius: 4px; cursor: pointer;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 8px 12px;
+      background: #607d8b;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
       box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     }
     .bottom-controls {
@@ -89,7 +134,7 @@
       authDomain: "attendance-6b1b6.firebaseapp.com",
       databaseURL: "https://attendance-6b1b6-default-rtdb.firebaseio.com",
       projectId: "attendance-6b1b6",
-      storageBucket: "attendance-6b1b6.firebasestorage.app",
+      storageBucket: "attendance-6b1b6.appspot.com",
       messagingSenderId: "808077953334",
       appId: "1:808077953334:web:238afede21744aee6f8b97"
     };
