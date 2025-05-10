@@ -377,7 +377,19 @@
       d.setDate(d.getDate() + offset);
       currentDate = d.toISOString().split("T")[0];
       datePicker._flatpickr.setDate(currentDate, true);
-      loadFromFirebase();
+      
+function listenRealtime() {
+  db.ref("attendance/겸손부/" + currentDate).on("value", snap => {
+    if (!snap.exists()) return;
+    const data = snap.val();
+    if (data.형제) data.형제.forEach((v,i) => brothersDiv.children[i]?.classList.toggle("present", v));
+    if (data.자매) data.자매.forEach((v,i) => sistersDiv.children[i]?.classList.toggle("present", v));
+    updateSummary();
+  });
+}
+
+
+  loadFromFirebase();
     }
 
     flatpickr(datePicker, {
@@ -386,7 +398,19 @@
       defaultDate: currentDate,
       onChange: (_, dateStr) => {
         currentDate = dateStr;
-        loadFromFirebase();
+        
+function listenRealtime() {
+  db.ref("attendance/겸손부/" + currentDate).on("value", snap => {
+    if (!snap.exists()) return;
+    const data = snap.val();
+    if (data.형제) data.형제.forEach((v,i) => brothersDiv.children[i]?.classList.toggle("present", v));
+    if (data.자매) data.자매.forEach((v,i) => sistersDiv.children[i]?.classList.toggle("present", v));
+    updateSummary();
+  });
+}
+
+
+  loadFromFirebase();
       },
       onDayCreate: function(_,__,___,el) {
         const d = new Date(el.dateObj.getTime() - el.dateObj.getTimezoneOffset()*60000);
@@ -397,7 +421,19 @@
       }
     });
 
-    loadFromFirebase();
+    
+function listenRealtime() {
+  db.ref("attendance/겸손부/" + currentDate).on("value", snap => {
+    if (!snap.exists()) return;
+    const data = snap.val();
+    if (data.형제) data.형제.forEach((v,i) => brothersDiv.children[i]?.classList.toggle("present", v));
+    if (data.자매) data.자매.forEach((v,i) => sistersDiv.children[i]?.classList.toggle("present", v));
+    updateSummary();
+  });
+}
+
+
+  loadFromFirebase();
   </script>
 </body>
 </html>
