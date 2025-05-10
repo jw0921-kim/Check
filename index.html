@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>📋동탄교회 청년회 출석부🩵</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -14,7 +16,6 @@
       flex-direction: column;
       align-items: center;
     }
-
     .logo {
       width: 120px;
       height: 120px;
@@ -23,7 +24,6 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
     }
-
     h1 {
       font-size: 28px;
       color: #2e3c59;
@@ -31,7 +31,6 @@
       font-weight: 600;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
-
     .button-container {
       display: flex;
       flex-direction: column;
@@ -39,7 +38,6 @@
       max-width: 320px;
       width: 100%;
     }
-
     button {
       padding: 16px;
       font-size: 18px;
@@ -52,13 +50,11 @@
       box-shadow: 0 4px 12px rgba(66, 165, 245, 0.3);
       transition: all 0.25s ease;
     }
-
     button:hover {
       background: linear-gradient(135deg, #1e88e5, #1976d2);
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(30, 136, 229, 0.35);
     }
-
     button:active {
       transform: translateY(0);
       box-shadow: 0 2px 6px rgba(30, 136, 229, 0.2);
@@ -73,5 +69,77 @@
     <button onclick="location.href='attendance_firebase_onyubu_scoped.html'">온유부 출석부</button>
     <button onclick="location.href='attendance_firebase_sarangbu_scoped.html'">사랑부 출석부</button>
   </div>
+
+  <h2 style="margin-top: 50px; color: #37474f;">방명록입니다~</h2>
+  <div style="width: 100%; max-width: 400px;">
+    <input id="guestName" type="text" placeholder="작성자 이름" style="width:100%; padding:10px; margin-bottom:8px; border-radius:10px; border:1px solid #ccc;" />
+    <textarea id="guestMessage" placeholder="방명록 내용을 입력하세요" style="width:100%; height:80px; padding:10px; border-radius:10px; border:1px solid #ccc;"></textarea>
+    <input id="guestPassword" type="password" placeholder="비밀번호 입력" style="width:100%; padding:10px; margin-bottom:8px; border-radius:10px; border:1px solid #ccc;" />
+    <button onclick="leaveMessage()" style="margin-top:10px; background: linear-gradient(135deg, #f48fb1, #f06292); color:white;">남기기</button>
+    <ul id="guestbook" style="list-style:none; padding:0; margin-top:20px;"></ul>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDE0261NNnULm2qta3Zs21wGqKGLXergCM",
+      authDomain: "attendance-6b1b6.firebaseapp.com",
+      databaseURL: "https://attendance-6b1b6-default-rtdb.firebaseio.com",
+      projectId: "attendance-6b1b6",
+      storageBucket: "attendance-6b1b6.appspot.com",
+      messagingSenderId: "609694001919",
+      appId: "1:609694001919:web:c9f1cf0d34e44711"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const guestbookRef = db.ref("guestbook");
+
+    const masterPassword = "qpqp1010";
+
+    function leaveMessage() {
+      const name = document.getElementById('guestName').value.trim();
+      const message = document.getElementById('guestMessage').value.trim();
+      const password = document.getElementById('guestPassword').value.trim();
+
+      if (name && message) {
+        const newEntry = {
+          name,
+          text: message,
+          password,
+          timestamp: Date.now()
+        };
+        guestbookRef.push(newEntry);
+        document.getElementById('guestName').value = "";
+        document.getElementById('guestMessage').value = "";
+        document.getElementById('guestPassword').value = "";
+      } else {
+        alert("작성자, 내용 모두 입력해야 합니다.");
+      }
+    }
+
+    guestbookRef.orderByChild("timestamp").limitToLast(30).on("child_added", snapshot => {
+      const data = snapshot.val();
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <strong>작성자:</strong> ${data.name}<br/>
+        <strong>내용:</strong> ${data.text}
+        <button onclick="deleteMessage('${snapshot.key}', '${data.password}')">삭제</button>`;
+      li.style.padding = '12px';
+      li.style.marginBottom = '10px';
+      li.style.background = '#fff';
+      li.style.borderRadius = '8px';
+      li.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+      document.getElementById("guestbook").prepend(li);
+    });
+
+    function deleteMessage(messageId, messagePassword) {
+      const input = prompt("비밀번호를 입력해주세요 (마스터는 qpqp1010)");
+      if (input === masterPassword || input === messagePassword) {
+        guestbookRef.child(messageId).remove();
+        alert("메시지를 삭제했습니다.");
+      } else {
+        alert("비밀번호가 틀립니다.");
+      }
+    }
+  </script>
 </body>
 </html>
