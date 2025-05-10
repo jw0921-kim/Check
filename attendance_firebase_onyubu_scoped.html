@@ -189,9 +189,25 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
       box-sizing: border-box;
     }
-    </style>
+    
+        .back-btn {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          background: #f3f7ff;
+          color: #37474f;
+          border: 1px solid #cfd8dc;
+          padding: 6px 12px;
+          font-size: 13px;
+          border-radius: 6px;
+          cursor: pointer;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        </style>
 </head>
 <body>
+<button class="back-btn" onclick="history.back()">← 뒤로가기</button>
+
 <h1>📋 온유부</h1>
 <div class="top-controls">
 <button id="prevDay">◀</button>
