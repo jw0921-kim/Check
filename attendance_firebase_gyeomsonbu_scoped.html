@@ -313,28 +313,6 @@
     }
 
     
-    let currentListener = null;
-
-    function loadFromFirebase() {
-      if (currentListener) currentListener.off();
-      const ref = db.ref("attendance/겸손부/" + currentDate);
-      currentListener = ref;
-
-      render(); // 반드시 먼저 렌더링하고 출석 상태 적용
-
-      ref.on("value", snap => {
-        [...brothersDiv.children].forEach(c => c.classList.remove("present"));
-        [...sistersDiv.children].forEach(c => c.classList.remove("present"));
-        if (!snap.exists()) return updateSummary();
-        const data = snap.val();
-        if (data.형제) data.형제.forEach((v,i) => brothersDiv.children[i]?.classList.toggle("present", v));
-        if (data.자매) data.자매.forEach((v,i) => sistersDiv.children[i]?.classList.toggle("present", v));
-        updateSummary();
-      });
-    }
-);
-    }
-
     function showToast(message) {
       const toast = document.createElement("div");
       toast.className = "toast";
@@ -389,7 +367,7 @@
       d.setDate(d.getDate() + offset);
       currentDate = d.toISOString().split("T")[0];
       datePicker._flatpickr.setDate(currentDate, true);
-      loadFromFirebase();
+      render(); enableRealtimeSync();
     }
 
     flatpickr(datePicker, {
@@ -398,7 +376,7 @@
       defaultDate: currentDate,
       onChange: (_, dateStr) => {
         currentDate = dateStr;
-        loadFromFirebase();
+        render(); enableRealtimeSync();
       },
       onDayCreate: function(_,__,___,el) {
         const d = new Date(el.dateObj.getTime() - el.dateObj.getTimezoneOffset()*60000);
@@ -409,7 +387,7 @@
       }
     });
 
-    loadFromFirebase();
+    render(); enableRealtimeSync();
   </script>
 </body>
 </html>
