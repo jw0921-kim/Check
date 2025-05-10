@@ -340,7 +340,7 @@
       const wd = ['일','월','화','수','목','금','토'][new Date(currentDate).getDay()];
       const bro = [...brothersDiv.children].filter(c => c.classList.contains("present")).map(c => c.textContent);
       const sis = [...sistersDiv.children].filter(c => c.classList.contains("present")).map(c => c.textContent);
-      const lines = [`${yy}.${mm}.${dd}(${wd}) 겸손부 총 ${bro.length + sis.length}명`];
+      const lines = [`${yy}.${mm}.${dd}(${wd}) 온유부 총 ${bro.length + sis.length}명`];
       lines.push(`형제님 ${bro.length}명`);
       for (let i=0; i<bro.length; i+=5) lines.push(bro.slice(i,i+5).join(" "));
       lines.push(``, `자매님 ${sis.length}명`);
