@@ -10,130 +10,76 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #fff1f9, #e0f7fa);
-      margin: 0;
-      padding: 8px;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 26px;
-      color: #37474f;
-      text-shadow: 1px 1px 1px rgba(255,255,255,0.6);
-    }
-    .top-controls {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 8px; }
+    h1 { text-align: center; margin-bottom: 5px; }
+    .top-controls { display: flex; justify-content: center; gap: 10px; margin-bottom: 15px; }
     .top-controls button {
       font-size: 16px;
-      padding: 8px 14px;
-      background: #aedff7;
+      padding: 6px 12px;
+      background: #607d8b;
       border: none;
-      color: #263238;
-      border-radius: 8px;
+      color: white;
+      border-radius: 4px;
       cursor: pointer;
-      transition: background 0.2s ease;
-    }
-    .top-controls button:hover {
-      background: #81d4fa;
     }
     .top-controls input {
       font-size: 16px;
-      padding: 8px;
-      width: 150px;
+      padding: 6px;
+      width: 140px;
       text-align: center;
-      border-radius: 8px;
+      border-radius: 4px;
       border: 1px solid #ccc;
-      background: #ffffffcc;
     }
-    .summary {
-      text-align: center;
-      font-weight: bold;
-      margin: 12px 0 20px;
-      color: #3e4a61;
-    }
-    .group-container {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
+    .summary { text-align: center; font-weight: bold; margin: 10px 0 20px; }
+    .group-container { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
     .group {
       flex: 1;
-      background: #ffffffdd;
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       max-width: 400px;
     }
-    .group h2 {
-      text-align: center;
-      margin-bottom: 12px;
-      color: #455a64;
-    }
-    .group h2 span {
-      font-size: 0.9rem;
-      color: #607d8b;
-      margin-left: 6px;
-    }
+    .group h2 { text-align: center; margin-bottom: 10px; }
+    .group h2 span { font-size: 0.9rem; color: #555; margin-left: 6px; }
     .names {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 10px;
     }
     .name {
-      padding: 10px;
+      padding: 8px;
       text-align: center;
-      border-radius: 10px;
-      background: #f1f8e9;
+      border-radius: 6px;
+      background: #eceff1;
       cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: inset 0 0 0 rgba(0,0,0,0);
+      transition: background 0.2s;
     }
-    .name:hover {
-      background: #dcedc8;
-      transform: scale(1.03);
-    }
-    .name.present {
-      background: #b2ebf2;
-      font-weight: bold;
-      box-shadow: inset 0 -3px 0 #81d4fa;
-    }
+    .name.present { background: #c8e6c9; }
     .toast {
       position: fixed;
       bottom: 60px;
       right: 20px;
-      background: rgba(0,0,0,0.75);
+      background: rgba(0,0,0,0.8);
       color: white;
-      padding: 10px 14px;
-      border-radius: 6px;
+      padding: 8px 12px;
+      border-radius: 4px;
       opacity: 0;
       transition: opacity 0.5s ease;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
     }
-    .toast.show {
-      opacity: 1;
-    }
+    .toast.show { opacity: 1; }
     #copyBtn {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      padding: 10px 16px;
-      background: #ffccbc;
-      color: #4e342e;
+      padding: 8px 12px;
+      background: #607d8b;
+      color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 4px;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-      transition: background 0.2s ease;
-    }
-    #copyBtn:hover {
-      background: #ffab91;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     }
     .bottom-controls {
       position: fixed;
@@ -143,19 +89,17 @@
       gap: 10px;
     }
     .bottom-controls button {
-      background: #ffd180;
-      padding: 10px 14px;
+      background: #607d8b;
+      padding: 8px 12px;
       font-size: 14px;
-      color: #3e2723;
+      color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 4px;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      box-sizing: border-box;
     }
-    .bottom-controls button:hover {
-      background: #ffca28;
-    }
-</style>
+  </style>
 </head>
 <body>
   <h1>📋 온유부</h1>
@@ -175,12 +119,182 @@
       <div class="names" id="sisters"></div>
     </div>
   </div>
+
   <div class="bottom-controls">
     <button id="clearAllBtn">전체 선택 해제</button>
     <button id="undoBtn">되돌리기</button>
     <button id="redoBtn">다시 실행</button>
   </div>
+
   <button id="copyBtn">복사</button>
-  <!-- 스크립트 생략 (이미 포함되어 있음) -->
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDrHDHrYO2Z8tWmWRgWYcN4nWHwALZ4c0s",
+      authDomain: "attendance-6b1b6.firebaseapp.com",
+      databaseURL: "https://attendance-6b1b6-default-rtdb.firebaseio.com",
+      projectId: "attendance-6b1b6",
+      storageBucket: "attendance-6b1b6.appspot.com",
+      messagingSenderId: "808077953334",
+      appId: "1:808077953334:web:238afede21744aee6f8b97"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const brothers = ["양인수", "김호진", "이상수", "정형기", "박수용", "고병인", "이동길", "정인교", "권세빈", "김용빈", "김승후", "홍정의", "김민성", "하현성", "김진우", "전은섭"];
+    const sisters = ["김유진", "이지희", "김민지", "임윤지", "박다은", "유재나", "김세연", "김채연", "임민해", "한예은", "임연주", "최연서", "한가은"];
+    let currentDate = new Date().toISOString().split("T")[0];
+
+    const datePicker = document.getElementById("datePicker");
+    const summary = document.getElementById("summary");
+    const broCountEl = document.getElementById("broCount");
+    const sisCountEl = document.getElementById("sisCount");
+    const brothersDiv = document.getElementById("brothers");
+    const sistersDiv = document.getElementById("sisters");
+
+    let undoStack = [];
+    let redoStack = [];
+
+    function getCurrentState() {
+      return {
+        형제: brothers.map((_, i) => brothersDiv.children[i].classList.contains("present")),
+        자매: sisters.map((_, i) => sistersDiv.children[i].classList.contains("present"))
+      };
+    }
+
+    function applyState(state) {
+      state.형제.forEach((v, i) => brothersDiv.children[i]?.classList.toggle("present", v));
+      state.자매.forEach((v, i) => sistersDiv.children[i]?.classList.toggle("present", v));
+      updateSummary();
+      saveToFirebase();
+    }
+
+    function pushUndoState() {
+      undoStack.push(getCurrentState());
+      redoStack = [];
+    }
+
+    function createTag(name) {
+      const div = document.createElement("div");
+      div.className = "name";
+      div.textContent = name;
+      div.onclick = () => {
+        pushUndoState();
+        div.classList.toggle("present");
+        updateSummary();
+        saveToFirebase();
+      };
+      return div;
+    }
+
+    function render() {
+      brothersDiv.innerHTML = "";
+      sistersDiv.innerHTML = "";
+      brothers.forEach(name => brothersDiv.appendChild(createTag(name)));
+      sisters.forEach(name => sistersDiv.appendChild(createTag(name)));
+    }
+
+    function updateSummary() {
+      const b = [...brothersDiv.children].filter(c => c.classList.contains("present")).length;
+      const s = [...sistersDiv.children].filter(c => c.classList.contains("present")).length;
+      summary.textContent = `총 출석: ${b + s}명`;
+      broCountEl.textContent = b ? `${b}명` : "";
+      sisCountEl.textContent = s ? `${s}명` : "";
+    }
+
+    function saveToFirebase() {
+      const bro = brothers.map((_, i) => brothersDiv.children[i].classList.contains("present"));
+      const sis = sisters.map((_, i) => sistersDiv.children[i].classList.contains("present"));
+      db.ref("attendance/온유부/" + currentDate).set({ 형제: bro, 자매: sis });
+    }
+
+    function loadFromFirebase() {
+      render();
+      db.ref("attendance/온유부/" + currentDate).get().then(snap => {
+        if (!snap.exists()) return updateSummary();
+        const data = snap.val();
+        if (data.형제) data.형제.forEach((v,i) => brothersDiv.children[i]?.classList.toggle("present", v));
+        if (data.자매) data.자매.forEach((v,i) => sistersDiv.children[i]?.classList.toggle("present", v));
+        updateSummary();
+      });
+    }
+
+    function showToast(message) {
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.classList.add("show"), 10);
+      setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => document.body.removeChild(toast), 500);
+      }, 2000);
+    }
+
+    document.getElementById("copyBtn").onclick = () => {
+      const yy = currentDate.slice(2,4), mm = currentDate.slice(5,7), dd = currentDate.slice(8,10);
+      const wd = ['일','월','화','수','목','금','토'][new Date(currentDate).getDay()];
+      const bro = [...brothersDiv.children].filter(c => c.classList.contains("present")).map(c => c.textContent);
+      const sis = [...sistersDiv.children].filter(c => c.classList.contains("present")).map(c => c.textContent);
+      const lines = [`${yy}.${mm}.${dd}(${wd}) 온유부 총 ${bro.length + sis.length}명`];
+      lines.push(`형제님 ${bro.length}명`);
+      for (let i=0; i<bro.length; i+=5) lines.push(bro.slice(i,i+5).join(" "));
+      lines.push(``, `자매님 ${sis.length}명`);
+      for (let i=0; i<sis.length; i+=5) lines.push(sis.slice(i,i+5).join(" "));
+      navigator.clipboard.writeText(lines.join("\\n")).then(() => showToast("출석 현황 복사됨!"));
+    };
+
+    document.getElementById("prevDay").onclick = () => changeDate(-1);
+    document.getElementById("nextDay").onclick = () => changeDate(1);
+    document.getElementById("clearAllBtn").onclick = () => {
+      pushUndoState();
+      [...brothersDiv.children].forEach(c => c.classList.remove("present"));
+      [...sistersDiv.children].forEach(c => c.classList.remove("present"));
+      updateSummary();
+      saveToFirebase();
+    };
+    document.getElementById("undoBtn").onclick = () => {
+      if (undoStack.length === 0) return showToast("되돌릴 작업이 없어요!");
+      redoStack.push(getCurrentState());
+      const prev = undoStack.pop();
+      applyState(prev);
+      showToast("되돌렸어요!");
+    };
+    document.getElementById("redoBtn").onclick = () => {
+      if (redoStack.length === 0) return showToast("다시 실행할 작업이 없어요!");
+      undoStack.push(getCurrentState());
+      const next = redoStack.pop();
+      applyState(next);
+      showToast("다시 실행했어요!");
+    };
+
+    function changeDate(offset) {
+      const d = new Date(currentDate);
+      d.setDate(d.getDate() + offset);
+      currentDate = d.toISOString().split("T")[0];
+      datePicker._flatpickr.setDate(currentDate, true);
+      loadFromFirebase();
+    }
+
+    flatpickr(datePicker, {
+      locale: "ko",
+      dateFormat: "Y-m-d",
+      defaultDate: currentDate,
+      onChange: (_, dateStr) => {
+        currentDate = dateStr;
+        loadFromFirebase();
+      },
+      onDayCreate: function(_,__,___,el) {
+        const d = new Date(el.dateObj.getTime() - el.dateObj.getTimezoneOffset()*60000);
+        const k = d.toISOString().split("T")[0];
+        db.ref("attendance/" + k).get().then(s => {
+          if (s.exists()) el.classList.add("attendance-day");
+        });
+      }
+    });
+
+    loadFromFirebase();
+  </script>
 </body>
 </html>
