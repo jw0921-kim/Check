@@ -203,33 +203,11 @@
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        
-  
-  
-  .home-btn {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: #f3f7ff;
-    color: #37474f;
-    border: 1px solid #cfd8dc;
-    padding: 4px 10px;
-    font-size: 13px;
-    border-radius: 6px;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-
-</style>
+        </style>
 </head>
 <body>
 <button class="back-btn" onclick="history.back()">← 뒤로가기</button>
-<button aria-label="홈으로 이동" class="home-btn" onclick="location.href='index.html'">
-<svg fill="none" height="20" stroke="#37474f" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg">
-<path d="M3 9L12 2l9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-<path d="M9 22V12h6v10"></path>
-</svg>
-</button>
+
 <h1>📋 겸손부</h1>
 <div class="top-controls">
 <button id="prevDay">◀</button>
@@ -267,9 +245,9 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const brothers = ["이태섭", "김진우", "이동환", "김지석", "전도영", "김권비", "김민호", "남준혁", "최재혁", "김인수", "문지훈", "전호성", "박지웅", "김두현", "박효원"];
-    const sisters = ["전효진", "고다영", "남소연", "김유나", "정여진", "심규리", "김민서", "박지혜", "심재경", "유지연", "심예림", "이소희", "임도해", "이현화", "김소은", "김이안"];
-    let currentDate = new Date().toISOString().split("T")[0];
+    let brothers = [];
+let sisters = [];
+let currentDate = new Date().toISOString().split("T")[0];
 
     const datePicker = document.getElementById("datePicker");
     const summary = document.getElementById("summary");
@@ -313,7 +291,17 @@
       return div;
     }
 
-    function render() {
+    
+function fetchNames() {
+  const namePath = "attendance/겸손부/명단";
+  return db.ref(namePath).get().then(snap => {
+    const data = snap.val() || {};
+    brothers = data.형제 || [];
+    sisters = data.자매 || [];
+  });
+}
+
+function render() {
       brothersDiv.innerHTML = "";
       sistersDiv.innerHTML = "";
       brothers.forEach(name => brothersDiv.appendChild(createTag(name)));
@@ -415,8 +403,7 @@ function loadFromFirebase() {
       d.setDate(d.getDate() + offset);
       currentDate = d.toISOString().split("T")[0];
       datePicker._flatpickr.setDate(currentDate, true);
-      render();
-    listenToFirebase();
+      fetchNames().then(() => { render(); listenToFirebase(); });
     }
 
     flatpickr(datePicker, {
@@ -428,8 +415,7 @@ function loadFromFirebase() {
         render();
         
         currentDate = dateStr;
-        render();
-    listenToFirebase();
+        fetchNames().then(() => { render(); listenToFirebase(); });
       },
       onDayCreate: function(_,__,___,el) {
         const d = new Date(el.dateObj.getTime() - el.dateObj.getTimezoneOffset()*60000);
@@ -440,8 +426,7 @@ function loadFromFirebase() {
       }
     });
 
-    render();
-    listenToFirebase();
+    fetchNames().then(() => { render(); listenToFirebase(); });
   </script>
 </body>
 </html>
