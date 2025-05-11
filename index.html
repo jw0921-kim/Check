@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>📋동탄교회 청년회 출석부🩵</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap">
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -15,6 +14,7 @@
       flex-direction: column;
       align-items: center;
     }
+
     .logo {
       width: 120px;
       height: 120px;
@@ -23,6 +23,7 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
     }
+
     h1 {
       font-size: 28px;
       color: #2e3c59;
@@ -30,6 +31,7 @@
       font-weight: 600;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
+
     .button-container {
       display: flex;
       flex-direction: column;
@@ -37,6 +39,7 @@
       max-width: 320px;
       width: 100%;
     }
+
     button {
       padding: 16px;
       font-size: 18px;
@@ -49,11 +52,13 @@
       box-shadow: 0 4px 12px rgba(66, 165, 245, 0.3);
       transition: all 0.25s ease;
     }
+
     button:hover {
       background: linear-gradient(135deg, #1e88e5, #1976d2);
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(30, 136, 229, 0.35);
     }
+
     button:active {
       transform: translateY(0);
       box-shadow: 0 2px 6px rgba(30, 136, 229, 0.2);
@@ -61,7 +66,6 @@
   </style>
 </head>
 <body>
-
   <img src="logo.png" alt="로고" class="logo">
   <h1>📋동탄교회 청년회 출석부🩵</h1>
   <div class="button-container">
@@ -70,197 +74,5 @@
     <button onclick="location.href='attendance_firebase_sarangbu_scoped.html'">사랑부 출석부</button>
     <button onclick="location.href='all.html'">전체현황 보기</button>
   </div>
-
-  <button onclick="toggleManagePanel()" style="position: fixed; bottom: 16px; left: 16px; background: #ffe0b2; border: none; padding: 10px 14px; border-radius: 8px; font-size: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); cursor: pointer;">+ 인원 관리</button>
-
-  <div id="managePanel" style="display:none; position: fixed; bottom: 70px; left: 16px; background: white; border: 1px solid #ccc; padding: 12px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 10; min-width: 250px;">
-    <div style="margin-bottom: 6px;">
-      <button onclick="setTab('add')" style="padding: 4px 8px; font-size: 12px;" id="tabAdd">➕ 추가</button>
-      <button onclick="setTab('del')" style="padding: 4px 8px; font-size: 12px;" id="tabDel">➖ 삭제</button>
-      <button onclick="setTab('swap')" style="padding: 4px 8px; font-size: 12px;" id="tabSwap">⇄ 이동</button>
-    </div>
-
-    <div id="tabAddBox">
-      <select id="depSelectAdd"><option>겸손부</option><option>온유부</option><option>사랑부</option></select>
-      <select id="genderSelectAdd"><option>형제</option><option>자매</option></select>
-      <input type="text" id="newNameInput" placeholder="이름 입력" style="width: 120px; padding: 2px 4px; font-size: 12px;"/>
-      <button onclick="addPerson()" style="margin-top: 4px; padding: 4px 8px; font-size: 12px;">추가</button>
-    </div>
-    <div id="tabDelBox" style="display:none;">
-      <select id="depSelectDel"><option>겸손부</option><option>온유부</option><option>사랑부</option></select>
-      <select id="genderSelectDel"><option>형제</option><option>자매</option></select>
-      <select id="nameSelectDel"><option>선택</option></select>
-      <button onclick="deletePerson()" style="margin-top: 4px; padding: 4px 8px; font-size: 12px;">삭제</button>
-      <button onclick="undoDelete()" style="margin-top: 4px; padding: 4px 8px; font-size: 12px;">↩ 되돌리기</button>
-    </div>
-
-    <div id="tabSwapBox" style="display:none;">
-      <select id="depSelectSwap"><option>겸손부</option><option>온유부</option><option>사랑부</option></select>
-      <select id="genderSelectSwap"><option>형제</option><option>자매</option></select>
-      <select id="fromIndex"><option>자리 1</option></select>
-      <select id="toIndex"><option>자리 2</option></select>
-      <button onclick="swapPersons()" style="margin-top: 4px; padding: 4px 8px; font-size: 12px;">교환</button>
-    </div>
-  </div>
-
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDrHDHrYO2Z8tWmWRgWYcN4nWHwALZ4c0s",
-      authDomain: "attendance-6b1b6.firebaseapp.com",
-      databaseURL: "https://attendance-6b1b6-default-rtdb.firebaseio.com",
-      projectId: "attendance-6b1b6",
-      storageBucket: "attendance-6b1b6.appspot.com",
-      messagingSenderId: "808077953334",
-      appId: "1:808077953334:web:238afede21744aee6f8b97"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    let deleteUndoStack = [];
-
-    function toggleManagePanel() {
-      const panel = document.getElementById("managePanel");
-      panel.style.display = panel.style.display === "none" ? "block" : "none";
-      if (document.getElementById("tabDelBox").style.display === "block") loadNameList();
-      if (document.getElementById("tabSwapBox").style.display === "block") loadSwapList();
-    }
-
-    function setTab(tab) {
-      document.getElementById("tabAddBox").style.display = tab === "add" ? "block" : "none";
-      document.getElementById("tabDelBox").style.display = tab === "del" ? "block" : "none";
-      document.getElementById("tabSwapBox").style.display = tab === "swap" ? "block" : "none";
-      if (tab === "del") loadNameList();
-      if (tab === "swap") loadSwapList();
-    }
-
-    function addPerson() {
-      const dep = document.getElementById("depSelectAdd").value;
-      const gender = document.getElementById("genderSelectAdd").value;
-      const newName = document.getElementById("newNameInput").value.trim();
-      if (!newName) return alert("이름을 입력해주세요!");
-
-      const date = new Date().toISOString().split("T")[0];
-      const path = "attendance/" + dep + "/" + date;
-      const namePath = "attendance/" + dep + "/명단/" + gender;
-
-      db.ref(path).get().then((snap) => {
-        const data = snap.val() || {};
-        const list = data[gender] || [];
-        list.push(true);
-        db.ref(path + "/" + gender).set(list);
-      });
-
-      db.ref(namePath).get().then((snap) => {
-        const names = snap.val() || [];
-        names.push(newName);
-        db.ref(namePath).set(names).then(() => {
-          alert(`${dep} ${gender}에 ${newName} 추가 완료!`);
-          document.getElementById("newNameInput").value = "";
-        });
-      });
-    }
-    function loadNameList() {
-      const dep = document.getElementById("depSelectDel").value;
-      const gender = document.getElementById("genderSelectDel").value;
-      const select = document.getElementById("nameSelectDel");
-      select.innerHTML = "";
-
-      const namePath = "attendance/" + dep + "/명단/" + gender;
-      const attendPath = "attendance/" + dep + "/" + new Date().toISOString().split("T")[0] + "/" + gender;
-
-      Promise.all([
-        db.ref(namePath).get(),
-        db.ref(attendPath).get()
-      ]).then(([namesSnap, attendSnap]) => {
-        const nameList = namesSnap.val() || [];
-        const attendList = attendSnap.val() || [];
-        for (let i = 0; i < attendList.length; i++) {
-          const name = nameList[i] || "(이름 없음)";
-          const option = document.createElement("option");
-          option.value = i;
-          option.text = `${name} (#${i + 1})`;
-          select.appendChild(option);
-        }
-      });
-    }
-
-    function deletePerson() {
-      const dep = document.getElementById("depSelectDel").value;
-      const gender = document.getElementById("genderSelectDel").value;
-      const index = parseInt(document.getElementById("nameSelectDel").value);
-      if (isNaN(index)) return alert("삭제할 인원을 선택하세요.");
-
-      const date = new Date().toISOString().split("T")[0];
-      const path = "attendance/" + dep + "/" + date + "/" + gender;
-
-      db.ref(path).get().then((snap) => {
-        const list = snap.val() || [];
-        const removed = list.splice(index, 1)[0];
-        deleteUndoStack.push({ dep, gender, index, value: removed, date });
-        db.ref(path).set(list).then(() => alert("삭제 완료!"));
-      });
-    }
-
-    function undoDelete() {
-      if (!deleteUndoStack.length) return alert("되돌릴 항목이 없어요.");
-      const { dep, gender, index, value, date } = deleteUndoStack.pop();
-      const path = "attendance/" + dep + "/" + date + "/" + gender;
-      db.ref(path).get().then((snap) => {
-        const list = snap.val() || [];
-        list.splice(index, 0, value);
-        db.ref(path).set(list).then(() => alert("되돌리기 완료!"));
-      });
-    }
-
-    function loadSwapList() {
-      const dep = document.getElementById("depSelectSwap").value;
-      const gender = document.getElementById("genderSelectSwap").value;
-      const date = new Date().toISOString().split("T")[0];
-      const namePath = "attendance/" + dep + "/명단/" + gender;
-      const path = "attendance/" + dep + "/" + date + "/" + gender;
-      const fromSel = document.getElementById("fromIndex");
-      const toSel = document.getElementById("toIndex");
-      fromSel.innerHTML = "";
-      toSel.innerHTML = "";
-
-      Promise.all([
-        db.ref(namePath).get(),
-        db.ref(path).get()
-      ]).then(([nameSnap, dataSnap]) => {
-        const nameList = nameSnap.val() || [];
-        const data = dataSnap.val() || [];
-        data.forEach((_, i) => {
-          const label = nameList[i] ? `${nameList[i]} (#${i + 1})` : `#${i + 1}`;
-          const opt1 = document.createElement("option");
-          const opt2 = document.createElement("option");
-          opt1.value = opt2.value = i;
-          opt1.text = opt2.text = label;
-          fromSel.appendChild(opt1);
-          toSel.appendChild(opt2);
-        });
-      });
-    }
-
-    function swapPersons() {
-      const dep = document.getElementById("depSelectSwap").value;
-      const gender = document.getElementById("genderSelectSwap").value;
-      const from = parseInt(document.getElementById("fromIndex").value);
-      const to = parseInt(document.getElementById("toIndex").value);
-      if (isNaN(from) || isNaN(to) || from === to) return alert("서로 다른 두 자리를 선택하세요.");
-
-      const date = new Date().toISOString().split("T")[0];
-      const path = "attendance/" + dep + "/" + date + "/" + gender;
-
-      db.ref(path).get().then((snap) => {
-        const list = snap.val() || [];
-        const temp = list[from];
-        list[from] = list[to];
-        list[to] = temp;
-        db.ref(path).set(list).then(() => alert("자리 교환 완료!"));
-      });
-    }
-  </script>
 </body>
 </html>
