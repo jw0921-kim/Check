@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -14,7 +15,6 @@
       flex-direction: column;
       align-items: center;
     }
-
     .logo {
       width: 120px;
       height: 120px;
@@ -23,7 +23,6 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
     }
-
     h1 {
       font-size: 28px;
       color: #2e3c59;
@@ -31,7 +30,6 @@
       font-weight: 600;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
-
     .button-container {
       display: flex;
       flex-direction: column;
@@ -39,7 +37,6 @@
       max-width: 320px;
       width: 100%;
     }
-
     button {
       padding: 16px;
       font-size: 18px;
@@ -52,13 +49,11 @@
       box-shadow: 0 4px 12px rgba(66, 165, 245, 0.3);
       transition: all 0.25s ease;
     }
-
     button:hover {
       background: linear-gradient(135deg, #1e88e5, #1976d2);
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(30, 136, 229, 0.35);
     }
-
     button:active {
       transform: translateY(0);
       box-shadow: 0 2px 6px rgba(30, 136, 229, 0.2);
@@ -74,5 +69,119 @@
     <button onclick="location.href='attendance_firebase_sarangbu_scoped.html'">사랑부 출석부</button>
     <button onclick="location.href='all.html'">전체현황 보기</button>
   </div>
+
+  <button onclick="toggleManagePanel()" id="manageBtn" style="position: fixed; bottom: 16px; left: 16px; background: #ffe082; border: none; padding: 6px 12px; border-radius: 4px; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">+ 인원 관리</button>
+
+  <div id="managePanel" style="display:none; position: fixed; bottom: 70px; left: 16px; background: #fff; border: 1px solid #ccc; padding: 12px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.15); z-index:999; min-width: 240px; max-width: 260px; font-size: 11px;">
+    <div style="margin-bottom: 8px; display: flex; flex-wrap: nowrap; align-items: center; gap: 6px; width: 100%; min-width: 400px;">
+      <select id="depSelect" onchange="loadLiveNames()" style="width: 65px;"><option>겸손부</option><option>온유부</option><option>사랑부</option></select>
+      <select id="genderSelect" onchange="loadLiveNames()" style="width: 60px;"><option>형제</option><option>자매</option></select>
+      <input type="text" id="newNameInput" placeholder="이름" style="flex: 0 0 auto; width: 70px; height: 20px; font-size: 10px; font-size: 11px; border: 1px solid #ccc; border-radius: 4px; padding: 0 4px;">
+      <button onclick="addName()" style="padding: 1px 4px; font-size: 10px; height: 20px; border-radius: 4px; background: #1565c0; color: white; border: 1px solid black;">추가</button>
+    </div>
+    <div style="margin-bottom: 8px;">
+      <select id="nameSelect" style="width: 120px;"><option>선택</option></select>
+      <button onclick="deleteName()" style="padding: 1px 4px; font-size: 10px; height: 20px; border-radius: 4px; background: #ffcdd2; border: 1px solid #b71c1c;">삭제</button>
+    </div>
+    <div>
+      <select id="fromIndex" style="width: 90px;"><option>자리 1</option></select>
+      <select id="toIndex" style="width: 90px;"><option>자리 2</option></select>
+      <button onclick="swapName()" style="padding: 1px 4px; font-size: 10px; height: 20px; border-radius: 4px; background: #ffb74d; border: 1px solid #e65100;">자리이동</button>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDrHDHrYO2Z8tWmWRgWYcN4nWHwALZ4c0s",
+      authDomain: "attendance-6b1b6.firebaseapp.com",
+      databaseURL: "https://attendance-6b1b6-default-rtdb.firebaseio.com",
+      projectId: "attendance-6b1b6",
+      storageBucket: "attendance-6b1b6.appspot.com",
+      messagingSenderId: "808077953334",
+      appId: "1:808077953334:web:238afede21744aee6f8b97"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function toggleManagePanel() {
+      const p = document.getElementById("managePanel");
+      p.style.display = p.style.display === "none" ? "block" : "none";
+      loadLiveNames();
+    }
+
+    function getPath() {
+      const dep = document.getElementById("depSelect").value;
+      const gender = document.getElementById("genderSelect").value;
+      return "attendance/" + dep + "/명단/" + gender;
+    }
+
+    function loadLiveNames() {
+      const path = getPath();
+      const select = document.getElementById("nameSelect");
+      const fromSel = document.getElementById("fromIndex");
+      const toSel = document.getElementById("toIndex");
+      db.ref(path).get().then(snap => {
+        const list = snap.val() || [];
+        select.innerHTML = "";
+        fromSel.innerHTML = "";
+        toSel.innerHTML = "";
+        list.forEach((name, i) => {
+          const label = name + ' (#' + (i+1) + ')';
+          const opt = new Option(label, i);
+          select.appendChild(opt);
+          const o1 = new Option(label, i);
+          const o2 = new Option(label, i);
+          fromSel.appendChild(o1);
+          toSel.appendChild(o2);
+        });
+      });
+    }
+
+    function addName() {
+      const path = getPath();
+      const name = document.getElementById("newNameInput").value.trim();
+      if (!name) return alert("이름을 입력하세요!");
+      db.ref(path).get().then(snap => {
+        const list = snap.val() || [];
+        list.push(name);
+        db.ref(path).set(list).then(() => {
+          alert("추가 완료!");
+          document.getElementById("newNameInput").value = "";
+          loadLiveNames();
+        });
+      });
+    }
+
+    function deleteName() {
+      const path = getPath();
+      const index = parseInt(document.getElementById("nameSelect").value);
+      if (isNaN(index)) return alert("삭제할 항목을 선택하세요.");
+      db.ref(path).get().then(snap => {
+        const list = snap.val() || [];
+        list.splice(index, 1);
+        db.ref(path).set(list).then(() => {
+          alert("삭제 완료!");
+          loadLiveNames();
+        });
+      });
+    }
+
+    function swapName() {
+      const path = getPath();
+      const from = parseInt(document.getElementById("fromIndex").value);
+      const to = parseInt(document.getElementById("toIndex").value);
+      if (isNaN(from) || isNaN(to) || from === to) return alert("서로 다른 두 자리를 선택하세요.");
+      db.ref(path).get().then(snap => {
+        const list = snap.val() || [];
+        [list[from], list[to]] = [list[to], list[from]];
+        db.ref(path).set(list).then(() => {
+          alert("자리이동 완료!");
+          loadLiveNames();
+        });
+      });
+    }
+  </script>
 </body>
 </html>
