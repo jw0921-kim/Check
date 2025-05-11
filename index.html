@@ -117,6 +117,12 @@
       return "attendance/" + dep + "/명단/" + gender;
     }
 
+    function getCheckPath() {
+      const dep = document.getElementById("depSelect").value;
+      const gender = document.getElementById("genderSelect").value;
+      return "attendance/" + dep + "/출석현황/" + gender;
+    }
+
     function loadLiveNames() {
       const path = getPath();
       const select = document.getElementById("nameSelect");
@@ -170,16 +176,25 @@
 
     function swapName() {
       const path = getPath();
+      const checkPath = getCheckPath();
       const from = parseInt(document.getElementById("fromIndex").value);
       const to = parseInt(document.getElementById("toIndex").value);
       if (isNaN(from) || isNaN(to) || from === to) return alert("서로 다른 두 자리를 선택하세요.");
-      db.ref(path).get().then(snap => {
-        const list = snap.val() || [];
-        [list[from], list[to]] = [list[to], list[from]];
-        db.ref(path).set(list).then(() => {
-          alert("자리이동 완료!");
-          loadLiveNames();
-        });
+      Promise.all([
+        db.ref(path).get(),
+        db.ref(checkPath).get()
+      ]).then(([nameSnap, checkSnap]) => {
+        const names = nameSnap.val() || [];
+        const checks = checkSnap.val() || [];
+        [names[from], names[to]] = [names[to], names[from]];
+        [checks[from], checks[to]] = [checks[to], checks[from]];
+        return Promise.all([
+          db.ref(path).set(names),
+          db.ref(checkPath).set(checks)
+        ]);
+      }).then(() => {
+        alert("자리이동 완료!");
+        loadLiveNames();
       });
     }
   </script>
