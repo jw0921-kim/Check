@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -46,22 +47,48 @@
       font-weight: 500;
       border: none;
       border-radius: 12px;
-      background: linear-gradient(135deg, #64b5f6, #42a5f5);
       color: white;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(66, 165, 245, 0.3);
       transition: all 0.25s ease;
     }
 
-    button:hover {
+    .default-button {
+      background: linear-gradient(135deg, #64b5f6, #42a5f5);
+      box-shadow: 0 4px 12px rgba(66, 165, 245, 0.3);
+    }
+
+    .default-button:hover {
       background: linear-gradient(135deg, #1e88e5, #1976d2);
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(30, 136, 229, 0.35);
     }
 
-    button:active {
+    .default-button:active {
       transform: translateY(0);
       box-shadow: 0 2px 6px rgba(30, 136, 229, 0.2);
+    }
+
+    .gyeomsonbu-button {
+      background: url('gyeomsonbu.jpg') center/cover no-repeat;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .green-button {
+      background: linear-gradient(135deg, #a5d6a7, #81c784);
+      box-shadow: 0 4px 12px rgba(129, 199, 132, 0.3);
+    }
+
+    .green-button:hover {
+      background: linear-gradient(135deg, #66bb6a, #4caf50);
+      box-shadow: 0 6px 16px rgba(102, 187, 106, 0.35);
+    }
+
+    .green-button:active {
+      box-shadow: 0 2px 6px rgba(76, 175, 80, 0.2);
     }
   </style>
 </head>
@@ -69,10 +96,11 @@
   <img src="logo.png" alt="로고" class="logo">
   <h1>📋동탄교회 청년회 출석부🩵</h1>
   <div class="button-container">
-    <button onclick="location.href='attendance_firebase_gyeomsonbu_scoped.html'">겸손부 출석부</button>
-    <button onclick="location.href='attendance_firebase_onyubu_scoped.html'">온유부 출석부</button>
-    <button onclick="location.href='attendance_firebase_sarangbu_scoped.html'">사랑부 출석부</button>
-    <button onclick="location.href='all.html'">전체현황 보기</button>
+    <button class="gyeomsonbu-button" onclick="location.href='attendance_firebase_gyeomsonbu_scoped.html'">겸손부 출석부</button>
+    <button class="default-button" onclick="location.href='attendance_firebase_onyubu_scoped.html'">온유부 출석부</button>
+    <button class="default-button" onclick="location.href='attendance_firebase_sarangbu_scoped.html'">사랑부 출석부</button>
+    <button class="default-button" onclick="location.href='all.html'">전체현황 보기</button>
+    <button class="green-button" onclick="location.href='attendance_firebase_daehakbu_scoped.html'">⚔️대학선교부🛡 출석부</button>
   </div>
 </body>
 </html>
