@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>출석부 자리이동 + 날짜별 출석 동기화 완전판</title>
+  <title>출석부 자리이동 + 출석 동기화</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -79,13 +78,11 @@
         return db.ref(attPath).get().then(attSnap => {
           let att = attSnap.val();
 
-          // 출석 데이터가 없으면 자동으로 0으로 채워서 저장
           if (!Array.isArray(att)) {
             att = new Array(names.length).fill(0);
             return db.ref(attPath).set(att).then(() => ({ names, att }));
           }
 
-          // 길이 맞지 않으면 보정
           if (att.length < names.length) {
             const diff = names.length - att.length;
             att = [...att, ...new Array(diff).fill(0)];
@@ -101,7 +98,7 @@
           div.className = "item";
           div.textContent = `${name} (${att[i] ? "O" : "X"})`;
           div.dataset.name = name;
-          div.dataset.att = att[i] || 0;
+          div.dataset.att = att[i];
           listContainer.appendChild(div);
         });
 
