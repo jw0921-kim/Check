@@ -4,11 +4,11 @@
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title>전체 출석 현황 보기</title>
+  <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
   <style>
     body {
       margin: 0;
@@ -16,16 +16,19 @@
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(to right, #f3e5f5, #e3f2fd);
     }
+
     h1 {
       text-align: center;
       margin-bottom: 4px;
       font-size: 24px;
       color: #333;
     }
+
     .date-picker {
       text-align: center;
       margin-bottom: 8px;
     }
+
     .date-picker input {
       padding: 8px;
       font-size: 16px;
@@ -33,14 +36,17 @@
       border: 1.5px solid #bbb;
       text-align: center;
     }
+
     .dashboard {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 12px;
+      gap: 16px;
     }
+
     .panel {
-      flex: 1 1 320px;
+      width: calc(33.33% - 16px);
+      min-width: 300px;
       max-width: 360px;
       background: white;
       border-radius: 12px;
@@ -50,11 +56,13 @@
       flex-direction: column;
       align-items: center;
     }
+
     .panel h2 {
       margin-bottom: 8px;
       font-size: 18px;
       color: #444;
     }
+
     .group-title {
       display: flex;
       align-items: baseline;
@@ -66,12 +74,14 @@
       color: #666;
       margin: 4px 0;
     }
+
     .names {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
       gap: 2px;
       padding: 0;
     }
+
     .name {
       text-align: center;
       padding: 6px 4px;
@@ -83,6 +93,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     .present {
       background: #e6f4ea !important;
       border: 2px solid #81c784;
