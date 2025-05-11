@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>📋동탄교회 청년회 출석부🩵</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap">
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -14,7 +15,6 @@
       flex-direction: column;
       align-items: center;
     }
-
     .logo {
       width: 120px;
       height: 120px;
@@ -23,7 +23,6 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
     }
-
     h1 {
       font-size: 28px;
       color: #2e3c59;
@@ -31,7 +30,6 @@
       font-weight: 600;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
-
     .button-container {
       display: flex;
       flex-direction: column;
@@ -39,7 +37,6 @@
       max-width: 320px;
       width: 100%;
     }
-
     button {
       padding: 16px;
       font-size: 18px;
@@ -52,13 +49,11 @@
       box-shadow: 0 4px 12px rgba(66, 165, 245, 0.3);
       transition: all 0.25s ease;
     }
-
     button:hover {
       background: linear-gradient(135deg, #1e88e5, #1976d2);
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(30, 136, 229, 0.35);
     }
-
     button:active {
       transform: translateY(0);
       box-shadow: 0 2px 6px rgba(30, 136, 229, 0.2);
@@ -66,6 +61,7 @@
   </style>
 </head>
 <body>
+
   <img src="logo.png" alt="로고" class="logo">
   <h1>📋동탄교회 청년회 출석부🩵</h1>
   <div class="button-container">
@@ -83,6 +79,8 @@
   <div style="margin-bottom: 6px;">
     <button onclick="setTab('add')" style="padding: 4px 8px; font-size: 12px;" id="tabAdd">➕ 추가</button>
     <button onclick="setTab('del')" style="padding: 4px 8px; font-size: 12px;" id="tabDel">➖ 삭제</button>
+    <button onclick="setTab('swap')" style="padding: 4px 8px; font-size: 12px;" id="tabSwap">⇄ 이동</button>
+
   </div>
 
   <div id="tabAddBox">
@@ -98,7 +96,16 @@
     <select id="nameSelectDel"><option>선택</option></select>
     <button onclick="deletePerson()" style="margin-top: 4px; padding: 4px 8px; font-size: 12px;">삭제</button>
     <button onclick="undoDelete()" style="margin-top: 4px; padding: 4px 8px; font-size: 12px;">↩ 되돌리기</button>
+  
+  <div id="tabSwapBox" style="display:none;">
+    <select id="depSelectSwap"><option>겸손부</option><option>온유부</option><option>사랑부</option></select>
+    <select id="genderSelectSwap"><option>형제</option><option>자매</option></select>
+    <select id="fromIndex"><option>자리 1</option></select>
+    <select id="toIndex"><option>자리 2</option></select>
+    <button onclick="swapPersons()" style="margin-top: 4px; padding: 4px 8px; font-size: 12px;">교환</button>
   </div>
+
+</div>
 </div>
 
 
@@ -217,5 +224,5 @@
   }
 </script>
 
-</body>
-</html>
+
+
