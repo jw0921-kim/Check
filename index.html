@@ -74,5 +74,360 @@
     <button onclick="location.href='attendance_firebase_sarangbu_scoped.html'">사랑부 출석부</button>
     <button onclick="location.href='all.html'">전체현황 보기</button>
   </div>
+
+<!-- 인원 관리 버튼 -->
+<button onclick="toggleManagePanel()" style="position: fixed; bottom: 16px; left: 16px; background: #ffe0b2; border: none; padding: 10px 14px; border-radius: 8px; font-size: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); cursor: pointer;">+ 인원 관리</button>
+
+<!-- 관리 패널 -->
+<div id="managePanel" style="display:none; position: fixed; bottom: 70px; left: 16px; background: white; border: 1px solid #ccc; padding: 12px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 10; min-width: 250px;">
+  <div style="margin-bottom: 6px;">
+    <button onclick="setTab('add')" style="padding: 4px 8px; font-size: 12px;" id="tabAdd">➕ 추가</button>
+    <button onclick="setTab('del')" style="padding: 4px 8px; font-size: 12px;" id="tabDel">➖ 삭제</button>
+    <button onclick="setTab('swap')" style="padding: 4px 8px; font-size: 12px;" id="tabSwap">⇄ 이동</button>
+
+  </div>
+
+  <div id="tabAddBox">
+    <select id="depSelectAdd"><option>겸손부</option><option>온유부</option><option>사랑부</option></select>
+    <select id="genderSelectAdd"><option>형제</option><option>자매</option></select>
+    <input type="text" id="newNameInput" placeholder="이름 입력" style="width: 120px; padding: 2px 4px; font-size: 12px;"/>
+    <button onclick="addPerson()" style="margin-top: 4px; padding: 4px 8px; font-size: 12px;">추가</button>
+  </div>
+
+  <div id="tabDelBox" style="display:none;">
+    <select id="depSelectDel"><option>겸손부</option><option>온유부</option><option>사랑부</option></select>
+    <select id="genderSelectDel"><option>형제</option><option>자매</option></select>
+    <select id="nameSelectDel"><option>선택</option></select>
+    <button onclick="deletePerson()" style="margin-top: 4px; padding: 4px 8px; font-size: 12px;">삭제</button>
+    <button onclick="undoDelete()" style="margin-top: 4px; padding: 4px 8px; font-size: 12px;">↩ 되돌리기</button>
+  
+  <div id="tabSwapBox" style="display:none;">
+    <select id="depSelectSwap"><option>겸손부</option><option>온유부</option><option>사랑부</option></select>
+    <select id="genderSelectSwap"><option>형제</option><option>자매</option></select>
+    <select id="fromIndex"><option>자리 1</option></select>
+    <select id="toIndex"><option>자리 2</option></select>
+    <button onclick="swapPersons()" style="margin-top: 4px; padding: 4px 8px; font-size: 12px;">교환</button>
+  </div>
+
+</div>
+</div>
+
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js">
+  let swapUndoStack = [];
+
+  function setTab(tab) {
+    document.getElementById("tabAddBox").style.display = tab === "add" ? "block" : "none";
+    document.getElementById("tabDelBox").style.display = tab === "del" ? "block" : "none";
+    document.getElementById("tabSwapBox").style.display = tab === "swap" ? "block" : "none";
+    if (tab === "del") loadNameList();
+    if (tab === "swap") loadSwapList();
+  }
+
+  function loadSwapList() {
+    const dep = document.getElementById("depSelectSwap").value;
+    const gender = document.getElementById("genderSelectSwap").value;
+    const date = new Date().toISOString().split("T")[0];
+    const path = "attendance/" + dep + "/" + date + "/" + gender;
+    const fromSel = document.getElementById("fromIndex");
+    const toSel = document.getElementById("toIndex");
+    fromSel.innerHTML = "";
+    toSel.innerHTML = "";
+
+    db.ref(path).get().then((snap) => {
+      const list = snap.val() || [];
+      list.forEach((_, i) => {
+        const opt1 = document.createElement("option");
+        const opt2 = document.createElement("option");
+        opt1.value = opt2.value = i;
+        opt1.text = opt2.text = `#${i + 1}`;
+        fromSel.appendChild(opt1);
+        toSel.appendChild(opt2);
+      });
+    });
+  }
+
+  function swapPersons() {
+    const dep = document.getElementById("depSelectSwap").value;
+    const gender = document.getElementById("genderSelectSwap").value;
+    const from = parseInt(document.getElementById("fromIndex").value);
+    const to = parseInt(document.getElementById("toIndex").value);
+    if (isNaN(from) || isNaN(to) || from === to) return alert("서로 다른 두 자리를 선택하세요.");
+
+    const date = new Date().toISOString().split("T")[0];
+    const path = "attendance/" + dep + "/" + date + "/" + gender;
+
+    db.ref(path).get().then((snap) => {
+      const list = snap.val() || [];
+      swapUndoStack.push({ dep, gender, date, prev: [...list] });
+      const temp = list[from];
+      list[from] = list[to];
+      list[to] = temp;
+      db.ref(path).set(list).then(() => alert("자리 교환 완료!"));
+    });
+  }
+
+  function undoDelete() {
+    if (deleteUndoStack.length) {
+      const { dep, gender, index, value, date } = deleteUndoStack.pop();
+      const path = "attendance/" + dep + "/" + date + "/" + gender;
+      db.ref(path).get().then((snap) => {
+        const list = snap.val() || [];
+        list.splice(index, 0, value);
+        db.ref(path).set(list).then(() => alert("되돌리기 완료!"));
+      });
+    } else if (swapUndoStack.length) {
+      const { dep, gender, date, prev } = swapUndoStack.pop();
+      const path = "attendance/" + dep + "/" + date + "/" + gender;
+      db.ref(path).set(prev).then(() => alert("자리 교환 되돌리기 완료!"));
+    } else {
+      alert("되돌릴 항목이 없어요.");
+    }
+  }
+
+</script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js">
+  let swapUndoStack = [];
+
+  function setTab(tab) {
+    document.getElementById("tabAddBox").style.display = tab === "add" ? "block" : "none";
+    document.getElementById("tabDelBox").style.display = tab === "del" ? "block" : "none";
+    document.getElementById("tabSwapBox").style.display = tab === "swap" ? "block" : "none";
+    if (tab === "del") loadNameList();
+    if (tab === "swap") loadSwapList();
+  }
+
+  function loadSwapList() {
+    const dep = document.getElementById("depSelectSwap").value;
+    const gender = document.getElementById("genderSelectSwap").value;
+    const date = new Date().toISOString().split("T")[0];
+    const path = "attendance/" + dep + "/" + date + "/" + gender;
+    const fromSel = document.getElementById("fromIndex");
+    const toSel = document.getElementById("toIndex");
+    fromSel.innerHTML = "";
+    toSel.innerHTML = "";
+
+    db.ref(path).get().then((snap) => {
+      const list = snap.val() || [];
+      list.forEach((_, i) => {
+        const opt1 = document.createElement("option");
+        const opt2 = document.createElement("option");
+        opt1.value = opt2.value = i;
+        opt1.text = opt2.text = `#${i + 1}`;
+        fromSel.appendChild(opt1);
+        toSel.appendChild(opt2);
+      });
+    });
+  }
+
+  function swapPersons() {
+    const dep = document.getElementById("depSelectSwap").value;
+    const gender = document.getElementById("genderSelectSwap").value;
+    const from = parseInt(document.getElementById("fromIndex").value);
+    const to = parseInt(document.getElementById("toIndex").value);
+    if (isNaN(from) || isNaN(to) || from === to) return alert("서로 다른 두 자리를 선택하세요.");
+
+    const date = new Date().toISOString().split("T")[0];
+    const path = "attendance/" + dep + "/" + date + "/" + gender;
+
+    db.ref(path).get().then((snap) => {
+      const list = snap.val() || [];
+      swapUndoStack.push({ dep, gender, date, prev: [...list] });
+      const temp = list[from];
+      list[from] = list[to];
+      list[to] = temp;
+      db.ref(path).set(list).then(() => alert("자리 교환 완료!"));
+    });
+  }
+
+  function undoDelete() {
+    if (deleteUndoStack.length) {
+      const { dep, gender, index, value, date } = deleteUndoStack.pop();
+      const path = "attendance/" + dep + "/" + date + "/" + gender;
+      db.ref(path).get().then((snap) => {
+        const list = snap.val() || [];
+        list.splice(index, 0, value);
+        db.ref(path).set(list).then(() => alert("되돌리기 완료!"));
+      });
+    } else if (swapUndoStack.length) {
+      const { dep, gender, date, prev } = swapUndoStack.pop();
+      const path = "attendance/" + dep + "/" + date + "/" + gender;
+      db.ref(path).set(prev).then(() => alert("자리 교환 되돌리기 완료!"));
+    } else {
+      alert("되돌릴 항목이 없어요.");
+    }
+  }
+
+</script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyDrHDHrYO2Z8tWmWRgWYcN4nWHwALZ4c0s",
+    authDomain: "attendance-6b1b6.firebaseapp.com",
+    databaseURL: "https://attendance-6b1b6-default-rtdb.firebaseio.com",
+    projectId: "attendance-6b1b6",
+    storageBucket: "attendance-6b1b6.appspot.com",
+    messagingSenderId: "808077953334",
+    appId: "1:808077953334:web:238afede21744aee6f8b97"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  let deleteUndoStack = [];
+
+  function toggleManagePanel() {
+    const panel = document.getElementById("managePanel");
+    panel.style.display = panel.style.display === "none" ? "block" : "none";
+    if (document.getElementById("tabDelBox").style.display === "block") loadNameList();
+  }
+
+  
+  function addPerson() {
+    const dep = document.getElementById("depSelectAdd").value;
+    const gender = document.getElementById("genderSelectAdd").value;
+    const newName = document.getElementById("newNameInput").value.trim();
+    if (!newName) return alert("이름을 입력해주세요!");
+
+    const date = new Date().toISOString().split("T")[0];
+    const path = "attendance/" + dep + "/" + date;
+
+    db.ref(path).get().then((snap) => {
+      const data = snap.val() || {};
+      const list = data[gender] || [];
+      list.push(true);
+      db.ref(path + "/" + gender).set(list).then(() => {
+        alert(`${dep} ${gender}에 ${newName} 추가 완료!`);
+        document.getElementById("newNameInput").value = "";
+      });
+    });
+  }
+
+  
+  function loadNameList() {
+    const dep = document.getElementById("depSelectDel").value;
+    const gender = document.getElementById("genderSelectDel").value;
+    const select = document.getElementById("nameSelectDel");
+    select.innerHTML = "";
+
+    const namesByDept = {
+      "겸손부": {
+        "형제": ["이태섭", "김진우", "이동환", "김지석", "전도영", "김권비", "김민호", "남준혁", "최재혁", "김인수", "문지훈", "전호성", "박지웅", "김두현", "박효원"],
+        "자매": ["전효진", "고다영", "남소연", "김유나", "정여진", "심규리", "김민서", "박지혜", "심재경", "유지연", "심예림", "이소희", "임도해", "이현화", "김소은", "김이안"]
+      },
+      "온유부": {
+        "형제": ["양인수", "김호진", "이상수", "정형기", "박수용", "고병인", "이동길", "정인교", "권세빈", "김용빈", "김승후", "홍정의", "김민성", "하현성", "김진우2", "전은섭"],
+        "자매": ["김유진", "이지희", "김민지", "임윤지", "박다은", "유재나", "김세연", "김채연", "임민해", "한예은", "임연주", "최연서", "한가은"]
+      },
+      "사랑부": {
+        "형제": ["신창현", "임우혁", "정용진", "강민구", "노현준", "양홍열", "김해원", "백진호", "김교식", "이신섭", "조시형", "임향원", "심어진", "오서준", "임주용", "김도건", "이준희"],
+        "자매": ["김혜련", "강민지", "최선영", "정희주", "박나은", "라유리", "하지원", "김호연", "유승비", "김주연", "강다빈", "이주화", "양정민", "한다빈", "유현지", "이다연"]
+      }
+    };
+
+    const nameList = namesByDept[dep][gender];
+    const date = new Date().toISOString().split("T")[0];
+    const attendRef = db.ref("attendance/" + dep + "/" + date + "/" + gender);
+    attendRef.get().then((snap) => {
+      const data = snap.val() || [];
+      data.forEach((_, idx) => {
+        const name = nameList[idx] || "(이름 없음)";
+        const option = document.createElement("option");
+        option.value = idx;
+        option.text = `${name} (#${idx + 1})`;
+        select.appendChild(option);
+      });
+    });
+  }
+
+  function deletePerson() {
+    const dep = document.getElementById("depSelectDel").value;
+    const gender = document.getElementById("genderSelectDel").value;
+    const index = parseInt(document.getElementById("nameSelectDel").value);
+    if (isNaN(index)) return alert("삭제할 인원을 선택하세요.");
+
+    const date = new Date().toISOString().split("T")[0];
+    const path = "attendance/" + dep + "/" + date + "/" + gender;
+
+    db.ref(path).get().then((snap) => {
+      const list = snap.val() || [];
+      const removed = list.splice(index, 1)[0];
+      deleteUndoStack.push({ dep, gender, index, value: removed, date });
+      db.ref(path).set(list).then(() => alert("삭제 완료!"));
+    });
+  }
+
+  
+  let swapUndoStack = [];
+
+  function setTab(tab) {
+    document.getElementById("tabAddBox").style.display = tab === "add" ? "block" : "none";
+    document.getElementById("tabDelBox").style.display = tab === "del" ? "block" : "none";
+    document.getElementById("tabSwapBox").style.display = tab === "swap" ? "block" : "none";
+    if (tab === "del") loadNameList();
+    if (tab === "swap") loadSwapList();
+  }
+
+  function loadSwapList() {
+    const dep = document.getElementById("depSelectSwap").value;
+    const gender = document.getElementById("genderSelectSwap").value;
+    const date = new Date().toISOString().split("T")[0];
+    const path = "attendance/" + dep + "/" + date + "/" + gender;
+    const fromSel = document.getElementById("fromIndex");
+    const toSel = document.getElementById("toIndex");
+    fromSel.innerHTML = "";
+    toSel.innerHTML = "";
+
+    db.ref(path).get().then((snap) => {
+      const list = snap.val() || [];
+      list.forEach((_, i) => {
+        const opt1 = document.createElement("option");
+        const opt2 = document.createElement("option");
+        opt1.value = opt2.value = i;
+        opt1.text = opt2.text = `#${i + 1}`;
+        fromSel.appendChild(opt1);
+        toSel.appendChild(opt2);
+      });
+    });
+  }
+
+  function swapPersons() {
+    const dep = document.getElementById("depSelectSwap").value;
+    const gender = document.getElementById("genderSelectSwap").value;
+    const from = parseInt(document.getElementById("fromIndex").value);
+    const to = parseInt(document.getElementById("toIndex").value);
+    if (isNaN(from) || isNaN(to) || from === to) return alert("서로 다른 두 자리를 선택하세요.");
+
+    const date = new Date().toISOString().split("T")[0];
+    const path = "attendance/" + dep + "/" + date + "/" + gender;
+
+    db.ref(path).get().then((snap) => {
+      const list = snap.val() || [];
+      swapUndoStack.push({ dep, gender, date, prev: [...list] });
+      const temp = list[from];
+      list[from] = list[to];
+      list[to] = temp;
+      db.ref(path).set(list).then(() => alert("자리 교환 완료!"));
+    });
+  }
+
+  function undoDelete() {
+    if (deleteUndoStack.length) {
+      const { dep, gender, index, value, date } = deleteUndoStack.pop();
+      const path = "attendance/" + dep + "/" + date + "/" + gender;
+      db.ref(path).get().then((snap) => {
+        const list = snap.val() || [];
+        list.splice(index, 0, value);
+        db.ref(path).set(list).then(() => alert("되돌리기 완료!"));
+      });
+    } else if (swapUndoStack.length) {
+      const { dep, gender, date, prev } = swapUndoStack.pop();
+      const path = "attendance/" + dep + "/" + date + "/" + gender;
+      db.ref(path).set(prev).then(() => alert("자리 교환 되돌리기 완료!"));
+    } else {
+      alert("되돌릴 항목이 없어요.");
+    }
+  }
+
+</script>
+
 </body>
 </html>
