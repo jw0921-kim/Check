@@ -1,34 +1,33 @@
+
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>전체 출석 현황 보기</title>
-  <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet"/>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>전체 출석 현황 보기</title>
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<style>
     body {
       margin: 0;
       padding: 8px;
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(to right, #f3e5f5, #e3f2fd);
     }
-
     h1 {
       text-align: center;
       margin-bottom: 4px;
       font-size: 24px;
       color: #333;
     }
-
     .date-picker {
       text-align: center;
       margin-bottom: 8px;
     }
-
     .date-picker input {
       padding: 8px;
       font-size: 16px;
@@ -36,36 +35,33 @@
       border: 1.5px solid #bbb;
       text-align: center;
     }
-
     .dashboard {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 16px;
-    }
-
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
     .panel {
-      width: calc(33.33% - 16px);
-      min-width: 300px;
-      max-width: 360px;
-      background: white;
-      border-radius: 12px;
-      padding: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
+  flex: 1 1 clamp(220px, 30vw, 360px);
+  max-width: 100%;
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
     .panel h2 {
       margin-bottom: 8px;
       font-size: 18px;
       color: #444;
     }
-
+    .group {
+      width: 100%;
+      margin: 4px 0;
+    }
     .group-title {
-      display: flex;
-      align-items: baseline;
+      display: flex; align-items: baseline;
       justify-content: center;
       gap: 2px;
       text-align: center;
@@ -74,26 +70,51 @@
       color: #666;
       margin: 4px 0;
     }
-
     .names {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-      gap: 2px;
-      padding: 0;
-    }
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 4px;
+  justify-content: center;
+}
 
+@media (max-height: 500px) {
+  .names {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+}
+@media (min-height: 501px) {
+  .names {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 4px;
+  justify-content: center;
+}
+
+@media (max-height: 500px) {
+  .names {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+}
     .name {
-      text-align: center;
-      padding: 6px 4px;
-      border-radius: 8px;
-      font-size: 9px;
-      background: #f7f7f7;
-      border: 1.5px solid #bbb;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+  text-align: center;
+  padding: 4px 3px;
+  border-radius: 8px;
+  font-size: clamp(11px, 1.8vw, 16px);
+  background: #f7f7f7;
+  border: 1.5px solid #bbb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
+@media (max-height: 500px) {
+  .name {
+    font-size: clamp(9px, 1.2vw, 13px);
+    padding: 3px 2px;
+  }
+}
     .present {
       background: #e6f4ea !important;
       border: 2px solid #81c784;
@@ -101,19 +122,65 @@
       font-weight: bold;
     }
   </style>
-</head>
+<style>#datePicker {
+  height: 26px !important;
+  width: 80px !important;
+  font-size: 15px !important;
+  line-height: 26px !important;
+  padding: 0 4px !important;
+  margin: 0 !important;
+  border: none !important;
+  text-align: center !important;
+  box-sizing: border-box !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+.flatpickr-input {
+  height: 26px !important;
+  font-size: 15px !important;
+  line-height: 26px !important;
+  padding: 0 4px !important;
+  margin: 0 !important;
+}</style><style>
+a.panel-link {
+  text-decoration: none;
+  color: inherit;
+}
+.panel-link .panel {
+  flex: 1 1 clamp(220px, 30vw, 360px);
+  max-width: 100%;
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.panel-link:active .panel,
+.panel:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+</style></head>
 <body>
-  <button onclick="history.back()" style="position: absolute; top: 10px; left: 10px;">←</button>
-  <div class="date-picker" style="display: flex; justify-content: center; gap: 8px;">
-    <button id="prevDay">◀</button>
-    <input id="datePicker" type="text"/>
-    <button id="nextDay">▶</button>
-  </div>
-  <div style="text-align: center; font-size: 20px; font-weight: bold;">전체출석현황</div>
-  <div id="totalSummary" style="text-align: right; font-size: 13px; color: #555; margin: 6px 0;"></div>
-  <div class="dashboard" id="dashboard"></div>
-
-  <script>
+<button onclick="history.back()" style="position: absolute; top: 10px; left: 10px; background: #f3f7ff; color: #37474f;
+    border: 1px solid #cfd8dc; padding: 6px 12px; font-size: 13px; border-radius: 6px; cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);">←</button>
+<div class="date-picker" style="display: flex; align-items: baseline; justify-content: center; align-items: center; gap: 8px;">
+<button id="prevDay" style="padding: 4px 6px; font-size: 12px;">◀</button>
+<input id="datePicker" style="width: 30px; font-size: 11px; padding: 1px;" type="text"/>
+<button id="nextDay" style="padding: 4px 6px; font-size: 12px;">▶</button>
+</div>
+<div style="display: flex; justify-content: center; position: relative; font-size: 20px; font-weight: bold; margin-top: 4px;">
+      전체출석현황
+      <div style="position: absolute; right: 1px; top: 2px; right: 0; text-align: right; font-size: 13px; font-weight: normal;"> </div>
+</div>
+<div id="totalSummary" style="text-align: right; font-size: 13px; color: #555; margin: 2px 4px 6px 0; "></div>
+<div class="dashboard" id="dashboard">
+<!-- Panels inserted by JS -->
+</div>
+<script>
     const firebaseConfig = {
       apiKey: "AIzaSyDrHDHrYO2Z8tWmWRgWYcN4nWHwALZ4c0s",
       authDomain: "attendance-6b1b6.firebaseapp.com",
@@ -125,6 +192,7 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+
     const departments = [
       {
         name: "겸손부",
@@ -142,17 +210,28 @@
         sisters: ["김혜련", "강민지", "최선영", "정희주", "박나은", "라유리", "하지원", "김호연", "유승비", "김주연", "강다빈", "이주화", "양정민", "한다빈", "유현지", "이다연"]
       }
     ];
+
+    const dashboard = document.getElementById("dashboard");
     let selectedDate = new Date().toISOString().split("T")[0];
 
+    
     function renderAll() {
-      const dashboard = document.getElementById("dashboard");
-      dashboard.innerHTML = "";
+      dashboard.innerHTML = ""; // Clear all panels first
       departments.forEach(dep => {
-        const panel = document.createElement("div");
-        panel.className = "panel";
+        
+      const panelLink = document.createElement("a");
+      panelLink.className = "panel-link";
+
+      if (dep.name === "겸손부") panelLink.href = "attendance_firebase_gyeomsonbu_scoped.html";
+      else if (dep.name === "온유부") panelLink.href = "attendance_firebase_onyubu_scoped.html";
+      else if (dep.name === "사랑부") panelLink.href = "attendance_firebase_sarangbu_scoped.html";
+
+      const panel = document.createElement("div");
+      panel.className = "panel";
         panel.innerHTML = `
-          <h2>${dep.name} <span id="${dep.name}_total" style="font-size: 13px;"></span></h2>
-          <div style="display: flex; gap: 6px; width: 100%;">
+          <h2>${dep.name} <span id="${dep.name}_total" style="font-size: 13px; color: #666;"></span></h2>
+          
+          <div style="display: flex; align-items: baseline; gap: 6px; width: 100%;">
             <div style="flex: 1;">
               <div class="group-title">형제 <span class="count" id="${dep.name}_bros_count"></span></div>
               <div class="names" id="${dep.name}_bros"></div>
@@ -161,45 +240,42 @@
               <div class="group-title">자매 <span class="count" id="${dep.name}_siss_count"></span></div>
               <div class="names" id="${dep.name}_siss"></div>
             </div>
-          </div>`;
-        dashboard.appendChild(panel);
+          </div>
+        `;
+        panelLink.appendChild(panel);
+        dashboard.appendChild(panelLink);
 
-        const brosDiv = panel.querySelector(`#${dep.name}_bros`);
-        const sissDiv = panel.querySelector(`#${dep.name}_siss`);
+        const brosDiv = document.getElementById(dep.name + "_bros");
+        const sissDiv = document.getElementById(dep.name + "_siss");
+
         const ref = db.ref("attendance/" + dep.name + "/" + selectedDate);
-
         ref.off();
         ref.on("value", snap => {
           let broCount = 0;
           let sisCount = 0;
-          brosDiv.innerHTML = "";
-          sissDiv.innerHTML = "";
 
+          brosDiv.innerHTML = "";
           dep.brothers.forEach((name, i) => {
             const div = document.createElement("div");
             div.className = "name";
             div.textContent = name;
-            if (snap.exists() && snap.val()?.형제?.[i]) {
-              div.classList.add("present");
-              broCount++;
-            }
+            if (snap.exists() && snap.val().형제?.[i]) { div.classList.add("present"); broCount++; }
             brosDiv.appendChild(div);
           });
 
+          sissDiv.innerHTML = "";
           dep.sisters.forEach((name, i) => {
             const div = document.createElement("div");
             div.className = "name";
             div.textContent = name;
-            if (snap.exists() && snap.val()?.자매?.[i]) {
-              div.classList.add("present");
-              sisCount++;
-            }
+            if (snap.exists() && snap.val().자매?.[i]) { div.classList.add("present"); sisCount++; }
             sissDiv.appendChild(div);
           });
 
-          panel.querySelector(`#${dep.name}_bros_count`).textContent = `${broCount}명`;
-          panel.querySelector(`#${dep.name}_siss_count`).textContent = `${sisCount}명`;
-          panel.querySelector(`#${dep.name}_total`).textContent = `총 ${broCount + sisCount}명`;
+          document.querySelector(`#${dep.name}_bros`).previousElementSibling.querySelector('.count').textContent = `${broCount}명`;
+          document.querySelector(`#${dep.name}_siss`).previousElementSibling.querySelector('.count').textContent = `${sisCount}명`;
+          const totalSpan = document.getElementById(`${dep.name}_total`);
+          if (totalSpan) totalSpan.textContent = `총 ${broCount + sisCount}명`;
 
           updateTotalSummary();
         });
@@ -207,29 +283,24 @@
     }
 
     function updateTotalSummary() {
-      let totalBro = 0, totalSis = 0;
+      let totalBro = 0;
+      let totalSis = 0;
+
       departments.forEach(dep => {
-        db.ref("attendance/" + dep.name + "/" + selectedDate).get().then(snap => {
+        const ref = db.ref("attendance/" + dep.name + "/" + selectedDate);
+        ref.get().then(snap => {
           const bros = snap.val()?.형제 || [];
           const siss = snap.val()?.자매 || [];
-          totalBro += bros.filter(Boolean).length;
-          totalSis += siss.filter(Boolean).length;
+          totalBro += bros.filter(x => x).length;
+          totalSis += siss.filter(x => x).length;
+
           if (dep.name === "사랑부") {
-            document.getElementById("totalSummary").textContent =
-              `출석 총 ${totalBro + totalSis}명 (형제님 ${totalBro}명, 자매님 ${totalSis}명)`;
+            const total = totalBro + totalSis;
+            document.getElementById("totalSummary").textContent = `출석 총 ${total}명 (형제님 ${totalBro}명, 자매님 ${totalSis}명)`;
           }
         });
       });
     }
-
-    function changeDate(offset) {
-      const d = new Date(selectedDate);
-      d.setDate(d.getDate() + offset);
-      selectedDate = d.toISOString().split("T")[0];
-      document.getElementById("datePicker")._flatpickr.setDate(selectedDate, true);
-      renderAll();
-    }
-
     flatpickr("#datePicker", {
       locale: "ko",
       dateFormat: "Y-m-d",
@@ -237,13 +308,110 @@
       onChange: function(_, dateStr) {
         selectedDate = dateStr;
         renderAll();
-      }
+    // Total summary calculation
+    let totalBro = 0;
+    let totalSis = 0;
+
+    departments.forEach(dep => {
+      db.ref("attendance/" + dep.name + "/" + selectedDate).get().then(snap => {
+        const bros = snap.val()?.형제 || [];
+        const siss = snap.val()?.자매 || [];
+        totalBro += bros.filter(x => x).length;
+        totalSis += siss.filter(x => x).length;
+
+        // After last department
+        if (dep.name === "사랑부") {
+          const total = totalBro + totalSis;
+          document.getElementById("totalSummary").textContent = `출석 총 ${total}명 (형제님 ${totalBro}명, 자매님 ${totalSis}명)`;
+        }
+      });
     });
+
 
     document.getElementById("prevDay").onclick = () => changeDate(-1);
     document.getElementById("nextDay").onclick = () => changeDate(1);
 
+    function changeDate(offset) {
+      const d = new Date(selectedDate);
+      d.setDate(d.getDate() + offset);
+      selectedDate = d.toISOString().split("T")[0];
+      document.getElementById("datePicker")._flatpickr.setDate(selectedDate, true);
+      renderAll();
+    // Total summary calculation
+    let totalBro = 0;
+    let totalSis = 0;
+
+    departments.forEach(dep => {
+      db.ref("attendance/" + dep.name + "/" + selectedDate).get().then(snap => {
+        const bros = snap.val()?.형제 || [];
+        const siss = snap.val()?.자매 || [];
+        totalBro += bros.filter(x => x).length;
+        totalSis += siss.filter(x => x).length;
+
+        // After last department
+        if (dep.name === "사랑부") {
+          const total = totalBro + totalSis;
+          document.getElementById("totalSummary").textContent = `출석 총 ${total}명 (형제님 ${totalBro}명, 자매님 ${totalSis}명)`;
+        }
+      });
+    });
+
+    }
+
+      }
+    });
+
     renderAll();
+    // Total summary calculation
+    let totalBro = 0;
+    let totalSis = 0;
+
+    departments.forEach(dep => {
+      db.ref("attendance/" + dep.name + "/" + selectedDate).get().then(snap => {
+        const bros = snap.val()?.형제 || [];
+        const siss = snap.val()?.자매 || [];
+        totalBro += bros.filter(x => x).length;
+        totalSis += siss.filter(x => x).length;
+
+        // After last department
+        if (dep.name === "사랑부") {
+          const total = totalBro + totalSis;
+          document.getElementById("totalSummary").textContent = `출석 총 ${total}명 (형제님 ${totalBro}명, 자매님 ${totalSis}명)`;
+        }
+      });
+    });
+
+
+    document.getElementById("prevDay").onclick = () => changeDate(-1);
+    document.getElementById("nextDay").onclick = () => changeDate(1);
+
+    function changeDate(offset) {
+      const d = new Date(selectedDate);
+      d.setDate(d.getDate() + offset);
+      selectedDate = d.toISOString().split("T")[0];
+      document.getElementById("datePicker")._flatpickr.setDate(selectedDate, true);
+      renderAll();
+    // Total summary calculation
+    let totalBro = 0;
+    let totalSis = 0;
+
+    departments.forEach(dep => {
+      db.ref("attendance/" + dep.name + "/" + selectedDate).get().then(snap => {
+        const bros = snap.val()?.형제 || [];
+        const siss = snap.val()?.자매 || [];
+        totalBro += bros.filter(x => x).length;
+        totalSis += siss.filter(x => x).length;
+
+        // After last department
+        if (dep.name === "사랑부") {
+          const total = totalBro + totalSis;
+          document.getElementById("totalSummary").textContent = `출석 총 ${total}명 (형제님 ${totalBro}명, 자매님 ${totalSis}명)`;
+        }
+      });
+    });
+
+    }
+
   </script>
 </body>
 </html>
