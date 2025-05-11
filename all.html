@@ -193,29 +193,32 @@ a.panel-link {
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const departments = [
-      {
-        name: "겸손부",
-        brothers: ["이태섭", "김진우", "이동환", "김지석", "전도영", "김권비", "김민호", "남준혁", "최재혁", "김인수", "문지훈", "전호성", "박지웅", "김두현", "박효원"],
-        sisters: ["전효진", "고다영", "남소연", "김유나", "정여진", "심규리", "김민서", "박지혜", "심재경", "유지연", "심예림", "이소희", "임도해", "이현화", "김소은", "김이안"]
-      },
-      {
-        name: "온유부",
-        brothers: ["양인수", "김호진", "이상수", "정형기", "박수용", "고병인", "이동길", "정인교", "권세빈", "김용빈", "김승후", "홍정의", "김민성", "하현성", "김진우2", "전은섭"],
-        sisters: ["김유진", "이지희", "김민지", "임윤지", "박다은", "유재나", "김세연", "김채연", "임민해", "한예은", "임연주", "최연서", "한가은"]
-      },
-      {
-        name: "사랑부",
-        brothers: ["신창현", "임우혁", "정용진", "강민구", "노현준", "양홍열", "김해원", "백진호", "김교식", "이신섭", "조시형", "임향원", "심어진", "오서준", "임주용", "김도건", "이준희"],
-        sisters: ["김혜련", "강민지", "최선영", "정희주", "박나은", "라유리", "하지원", "김호연", "유승비", "김주연", "강다빈", "이주화", "양정민", "한다빈", "유현지", "이다연"]
-      }
-    ];
+    let departments = [];
 
     const dashboard = document.getElementById("dashboard");
     let selectedDate = new Date().toISOString().split("T")[0];
 
     
-    function renderAll() {
+    
+function loadDepartments() {
+  const deptNames = ["겸손부", "온유부", "사랑부"];
+  const promises = deptNames.map(name =>
+    db.ref("attendance/" + name + "/명단").get().then(snap => {
+      const data = snap.val() || {};
+      return {
+        name,
+        brothers: data.형제 || [],
+        sisters: data.자매 || []
+      };
+    })
+  );
+  return Promise.all(promises).then(results => {
+    departments = results;
+    renderAll();
+  });
+}
+
+function renderAll() {
       dashboard.innerHTML = ""; // Clear all panels first
       departments.forEach(dep => {
         
@@ -307,7 +310,7 @@ a.panel-link {
       defaultDate: selectedDate,
       onChange: function(_, dateStr) {
         selectedDate = dateStr;
-        renderAll();
+        loadDepartments();
     // Total summary calculation
     let totalBro = 0;
     let totalSis = 0;
@@ -336,7 +339,7 @@ a.panel-link {
       d.setDate(d.getDate() + offset);
       selectedDate = d.toISOString().split("T")[0];
       document.getElementById("datePicker")._flatpickr.setDate(selectedDate, true);
-      renderAll();
+      loadDepartments();
     // Total summary calculation
     let totalBro = 0;
     let totalSis = 0;
@@ -361,7 +364,7 @@ a.panel-link {
       }
     });
 
-    renderAll();
+    loadDepartments();
     // Total summary calculation
     let totalBro = 0;
     let totalSis = 0;
@@ -390,7 +393,7 @@ a.panel-link {
       d.setDate(d.getDate() + offset);
       selectedDate = d.toISOString().split("T")[0];
       document.getElementById("datePicker")._flatpickr.setDate(selectedDate, true);
-      renderAll();
+      loadDepartments();
     // Total summary calculation
     let totalBro = 0;
     let totalSis = 0;
