@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>출석부 자리이동 + 출석 동기화</title>
+  <title>실시간 출석 랜더링</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -19,7 +20,7 @@
 </head>
 <body>
   <div class="container">
-    <h2>출석부 자리이동 + 날짜별 확인</h2>
+    <h2>출석부 (실시간 반영)</h2>
     <div style="text-align: center;">
       <select id="depSelect">
         <option>겸손부</option>
@@ -52,6 +53,8 @@
 
     const listContainer = document.getElementById("nameList");
     let sortable;
+    let currentAttPath = null;
+    let currentNames = [];
 
     flatpickr("#datePicker", {
       dateFormat: "Y-m-d",
@@ -70,14 +73,15 @@
 
     function loadList() {
       const { namePath, attPath } = getPath();
+      currentAttPath = attPath;
       listContainer.innerHTML = "불러오는 중...";
 
       db.ref(namePath).get().then(nameSnap => {
         const names = nameSnap.val() || [];
+        currentNames = names;
 
-        return db.ref(attPath).get().then(attSnap => {
+        return db.ref(attPath).once("value").then(attSnap => {
           let att = attSnap.val();
-
           if (!Array.isArray(att)) {
             att = new Array(names.length).fill(0);
             return db.ref(attPath).set(att).then(() => ({ names, att }));
@@ -91,20 +95,26 @@
 
           return { names, att };
         });
-      }).then(({ names, att }) => {
-        listContainer.innerHTML = "";
-        names.forEach((name, i) => {
-          const div = document.createElement("div");
-          div.className = "item";
-          div.textContent = `${name} (${att[i] ? "O" : "X"})`;
-          div.dataset.name = name;
-          div.dataset.att = att[i];
-          listContainer.appendChild(div);
+      }).then(() => {
+        db.ref(currentAttPath).on("value", snap => {
+          const att = snap.val() || [];
+          renderList(currentNames, att);
         });
-
-        if (sortable) sortable.destroy();
-        sortable = Sortable.create(listContainer, { animation: 150 });
       });
+    }
+
+    function renderList(names, att) {
+      listContainer.innerHTML = "";
+      names.forEach((name, i) => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.textContent = `${name} (${att[i] ? "O" : "X"})`;
+        div.dataset.name = name;
+        div.dataset.att = att[i] || 0;
+        listContainer.appendChild(div);
+      });
+      if (sortable) sortable.destroy();
+      sortable = Sortable.create(listContainer, { animation: 150 });
     }
 
     function saveOrder() {
