@@ -126,6 +126,13 @@ a.panel-link {
   transform: scale(0.97);
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
+
+/* 가로모드일 때 3열로 자동 증가 */
+@media screen and (orientation: landscape) and (min-width: 600px) {
+  .names {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
 </style></head>
 <body>
 <button onclick="history.back()" style="position: absolute; top: 10px; left: 10px; background: #f3f7ff; color: #37474f;
