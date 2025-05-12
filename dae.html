@@ -361,17 +361,49 @@ function loadFromFirebase() {
     }
 
     document.getElementById("copyBtn").onclick = () => {
-      const yy = currentDate.slice(2,4), mm = currentDate.slice(5,7), dd = currentDate.slice(8,10);
-      const wd = ['일','월','화','수','목','금','토'][new Date(currentDate).getDay()];
-      const bro = [...brothersDiv.children].filter(c => c.classList.contains("present")).map(c => c.textContent);
-      const sis = [...sistersDiv.children].filter(c => c.classList.contains("present")).map(c => c.textContent);
-      const lines = [`${yy}.${mm}.${dd}(${wd}) 대학부 총 ${bro.length + sis.length}명`];
-      lines.push(`형제님 ${bro.length}명`);
-      for (let i=0; i<bro.length; i+=5) lines.push(bro.slice(i,i+5).join(" "));
-      lines.push(``, `자매님 ${sis.length}명`);
-      for (let i=0; i<sis.length; i+=5) lines.push(sis.slice(i,i+5).join(" "));
-      navigator.clipboard.writeText(lines.join("\n")).then(() => showToast("출석 현황 복사됨!"));
-    };
+  const yy = currentDate.slice(2,4);
+  const mm = currentDate.slice(5,7);
+  const dd = currentDate.slice(8,10);
+  const wd = ['일','월','화','수','목','금','토'][new Date(currentDate).getDay()];
+  const bro = [...brothersDiv.children].filter(c => c.classList.contains("present")).map(c => c.textContent);
+  const sis = [...sistersDiv.children].filter(c => c.classList.contains("present")).map(c => c.textContent);
+
+  const freshmen = [...bro, ...sis].filter(name => ['오서준', '김도건', '김진우', '김두현', '한가은', '이다연'] .includes(name));
+  const broOnly = bro.filter(name => !freshmen.includes(name));
+  const sisOnly = sis.filter(name => !freshmen.includes(name));
+
+  const lines = [
+    `☘️${yy}.${mm}.${dd} (${wd}) 대학선교부 출석☘️`,
+    ``,
+    `형제님🙋🏻‍♂️`,
+    broOnly.join(', ') || '-',
+    ``,
+    `자매님🙋🏻‍♀️`,
+    sisOnly.join(', ') || '-',
+    ``,
+    `💛신입생💛`,
+    freshmen.join(', ') || '-',
+    ``,
+    `형제님: ${broOnly.length}명`,
+    `자매님: ${sisOnly.length}명`,
+    `신입생: ${freshmen.length}명`,
+    ``,
+    `총 “${broOnly.length + sisOnly.length + freshmen.length}명” 참석하였습니다`
+  ];
+
+  navigator.clipboard.writeText(lines.join("
+")).then(() => {
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.textContent = "출석 현황 복사됨!";
+    document.body.appendChild(toast);
+    setTimeout(() => toast.classList.add("show"), 10);
+    setTimeout(() => {
+      toast.classList.remove("show");
+      setTimeout(() => document.body.removeChild(toast), 500);
+    }, 2000);
+  });
+};
 
     document.getElementById("prevDay").onclick = () => changeDate(-1);
     document.getElementById("nextDay").onclick = () => changeDate(1);
