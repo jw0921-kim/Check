@@ -464,52 +464,52 @@ function showToast(msg) {
   const freshmen = ["오서준", "김도건", "김진우", "한가은", "이다연", "김두현"];
 
   
-document.getElementById("copyBtn").onclick = () => {
-    const broNames = [...document.querySelectorAll("#brothers .present")].map(el => el.textContent);
-    const sisNames = [...document.querySelectorAll("#sisters .present")].map(el => el.textContent);
-    const freshNames = [...broNames, ...sisNames].filter(name => freshmen.includes(name));
-    const broFinal = broNames.filter(name => !freshNames.includes(name));
-    const sisFinal = sisNames.filter(name => !freshNames.includes(name));
-    
-    const date = new Date(currentDate);
-    const [yy, mm, dd] = date.toLocaleDateString("ko-KR", {
-        year: "2-digit", month: "2-digit", day: "2-digit"
-    }).split('.').map(s => s.trim());
-    const wd = date.toLocaleDateString("ko-KR", { weekday: "short" });
-    const day = `${yy}.${mm}.${dd}(${wd})`;
-    
-    let text = `☘️${day} 대학선교부 출석☘️
+    document.getElementById("copyBtn").onclick = () => {
+        const broNames = [...document.querySelectorAll("#brothers .present")].map(el => el.textContent);
+        const sisNames = [...document.querySelectorAll("#sisters .present")].map(el => el.textContent);
+        const freshNames = [...broNames, ...sisNames].filter(name => freshmen.includes(name));
+        const broFinal = broNames.filter(name => !freshNames.includes(name));
+        const sisFinal = sisNames.filter(name => !freshNames.includes(name));
+        
+        const date = new Date(currentDate);
+        const [yy, mm, dd] = date.toLocaleDateString("ko-KR", {
+            year: "2-digit", month: "2-digit", day: "2-digit"
+        }).split('.').map(s => s.trim());
+        const wd = date.toLocaleDateString("ko-KR", { weekday: "short" });
+        const day = `${yy}.${mm}.${dd}(${wd})`;
+        
+        let text = `☘️${day} 대학선교부 출석☘️
 
 `;
-    if (broFinal.length) text += `형제님🙋🏻‍♂️
+        if (broFinal.length) text += `형제님🙋🏻‍♂️
 ${formatNamesWithLineBreak(broFinal)}
 
 `;
-    if (sisFinal.length) text += `자매님🙋🏻‍♀️
+        if (sisFinal.length) text += `자매님🙋🏻‍♀️
 ${formatNamesWithLineBreak(sisFinal)}
 
 `;
-    if (freshNames.length) text += `💛신입생💛
+        if (freshNames.length) text += `💛신입생💛
 ${formatNamesWithLineBreak(freshNames)}
 
 `;
-    if (broFinal.length) text += `형제님: ${broFinal.length}명
+        if (broFinal.length) text += `형제님: ${broFinal.length}명
 `;
-    if (sisFinal.length) text += `자매님: ${sisFinal.length}명
+        if (sisFinal.length) text += `자매님: ${sisFinal.length}명
 `;
-    if (freshNames.length) text += `신입생: ${freshNames.length}명
+        if (freshNames.length) text += `신입생: ${freshNames.length}명
 `;
-    const total = broFinal.length + sisFinal.length + freshNames.length;
-    text += `
+        const total = broFinal.length + sisFinal.length + freshNames.length;
+        text += `
 총 “${total}명” 참석하였습니다`;
-    
-    navigator.clipboard.writeText(text).then(() => {
-        const toast = document.getElementById("toast");
-        toast.textContent = "클립보드에 복사됨!";
-        toast.classList.add("show");
-        setTimeout(() => toast.classList.remove("show"), 2000);
-    });
-};
+        
+        navigator.clipboard.writeText(text).then(() => {
+            const toast = document.getElementById("toast");
+            toast.textContent = "클립보드에 복사됨!";
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 2000);
+        });
+    };
 
 
   }
