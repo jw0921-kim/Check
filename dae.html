@@ -133,14 +133,29 @@
   opacity: 1;
 }
 
+
+.bottom-right-controls {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+.bottom-right-controls button {
+  background: #e0f7fa;
+  color: #006064;
+  padding: 8px 12px;
+  font-size: 13px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
 </style>
 </head>
 <body>
 <button class="back-btn" onclick="history.back()">← 뒤로가기</button>
 <h1>📋 대학부</h1>
 <div class="top-controls">
-  <button id="copyBtn">복사</button>
-  <button id="prevDay">◀</button>
+    <button id="prevDay">◀</button>
   <input id="datePicker" type="text"/>
   <button id="nextDay">▶</button>
 </div>
@@ -160,6 +175,10 @@
   <button id="undoBtn">되돌리기</button>
   <button id="redoBtn">다시 실행</button>
 </div>
+<div class="bottom-right-controls">
+  <button id="copyBtn">복사</button>
+</div>
+
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyDrHDHrYO2Z8tWmWRgWYcN4nWHwALZ4c0s",
