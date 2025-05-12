@@ -1,16 +1,17 @@
 
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
-  <meta charset="utf-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>출석부 Firebase 연동</title>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet"/>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>출석부 Firebase 연동</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+<style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(to right, #e3f2fd 0%, #fff0f5 100%);
@@ -149,37 +150,196 @@
   cursor: pointer;
 }
 
+
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  cursor: pointer;
+  padding: 8px 12px;
+  font-size: 13px;
+  border-radius: 6px;
+  border: none;
+}
+#undoBtn, #redoBtn {
+  background: #fff3e0;
+  color: #6d4c41;
+}
+#copyBtn {
+  background: #e0f7fa;
+  color: #006064;
+}
+
+.bottom-controls, .bottom-right-controls {
+  z-index: 1000;
+}
+
+.bottom-controls button, .bottom-right-controls button {
+  min-width: 80px;
+}
+
+.toast {
+  pointer-events: none;
+}
+
+#copyBtn {
+  width: 64px;
+  padding: 8px 6px;
+}
+
+#copyBtn {
+  width: 52px;
+  padding: 6px 4px;
+  font-size: 12px;
+}
+
+#clearAllBtn {
+  height: 32px;
+  width: auto;
+  padding: 6px 10px;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#copyBtn {
+  height: 32px;
+  width: auto;
+  padding: 6px 10px;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#undoBtn, #redoBtn {
+  height: 32px;
+  width: auto;
+  padding: 6px 10px;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bottom-right-controls {
+  position: fixed;
+  bottom: 20px;
+  right: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+#copyBtn {
+  height: 32px;
+  width: auto;
+  padding: 6px 6px;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#copyBtn {
+  padding: 6px 4px;  /* reduce left/right padding */
+}
+
+#copyBtn {
+  padding: 4px 1px !important;  /* 가장 최소의 패딩 */
+  width: fit-content !important; /* 글자 크기에 맞추기 */
+  white-space: nowrap !important;
+}
+
+#copyBtn {
+  padding: 4px 2px !important; /* 패딩을 최소화하여 좁게 설정 */
+  width: auto !important;
+  white-space: nowrap !important;
+}
+
+#undoBtn, #redoBtn {
+  padding: 6px 10px !important; /* 기존 스타일 유지 */
+}
+
+#copyBtn {
+  padding: 3px 1px !important; /* 가능한 최소 패딩 */
+  width: fit-content !important; /* 정확히 글자 너비에 맞춤 */
+  min-width: unset !important;
+  white-space: nowrap !important;
+  box-sizing: content-box !important;
+}
+
+.bottom-right-controls {
+  right: 12px;
+  bottom: 20px;
+  display: flex;
+  justify-content: flex-end;
+  width: auto !important;
+}
+
+#copyBtn {
+  padding: 4px 8px !important; /* 좌우 여백 적당히 조정 */
+  width: fit-content !important;
+  box-sizing: content-box !important;
+}
+
+#copyBtn {
+  padding: 4px 8px !important;
+  width: calc(2em + 16px) !important; /* "복사복사" 글씨 크기만큼 너비 설정 */
+  text-align: center !important;
+  justify-content: center !important;
+  display: inline-flex !important;
+  box-sizing: content-box !important;
+}
+
+#copyBtn, #clearAllBtn {
+  height: 32px !important; /* 동일한 세로 높이로 설정 */
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important; /* 수직 정렬 */
+  justify-content: center !important; /* 수평 정렬 */
+  box-sizing: border-box !important;
+}
+
+#copyBtn {
+  width: calc(3em + 24px) !important; /* 기존보다 더 늘림 */
+}
 </style>
 </head>
 <body>
 <button class="back-btn" onclick="history.back()">← 뒤로가기</button>
 <h1>📋 대학부</h1>
 <div class="top-controls">
-    <button id="prevDay">◀</button>
-  <input id="datePicker" type="text"/>
-  <button id="nextDay">▶</button>
+<button id="prevDay">◀</button>
+<input id="datePicker" type="text"/>
+<button id="nextDay">▶</button>
 </div>
 <div class="summary" id="summary">총 출석: 0명</div>
 <div class="group-container">
-  <div class="group">
-    <h2>형제 <span id="broCount"></span></h2>
-    <div class="names" id="brothers"></div>
-  </div>
-  <div class="group">
-    <h2>자매 <span id="sisCount"></span></h2>
-    <div class="names" id="sisters"></div>
-  </div>
+<div class="group">
+<h2>형제 <span id="broCount"></span></h2>
+<div class="names" id="brothers"></div>
+</div>
+<div class="group">
+<h2>자매 <span id="sisCount"></span></h2>
+<div class="names" id="sisters"></div>
+</div>
 </div>
 <div class="bottom-controls">
-  <button id="clearAllBtn">전체 선택 해제</button>
-  <button id="undoBtn">되돌리기</button>
-  <button id="redoBtn">다시 실행</button>
+<button id="clearAllBtn">전체 선택 해제</button>
+<button id="undoBtn">되돌리기</button>
+<button id="redoBtn">다시 실행</button>
 </div>
 <div class="bottom-right-controls">
-  <button id="copyBtn">복사</button>
+<button id="copyBtn">복사</button>
 </div>
-
 <script>
+  function formatNamesWithLineBreak(names) {
+    return names.map((name, i) => (i > 0 && i % 5 === 0 ? "\n" : "") + name).join(", ");
+  }
+
   const firebaseConfig = {
     apiKey: "AIzaSyDrHDHrYO2Z8tWmWRgWYcN4nWHwALZ4c0s",
     authDomain: "attendance-6b1b6.firebaseapp.com",
@@ -283,12 +443,23 @@
   }
 
   function changeDate(offset) {
+  undoStack = [];
+  redoStack = [];
     db.ref("attendance/대학부/" + currentDate).off();
     const d = new Date(currentDate);
     d.setDate(d.getDate() + offset);
     currentDate = d.toISOString().split("T")[0];
     datePicker._flatpickr.setDate(currentDate, true);
     fetchNames().then(() => { render(); listenToFirebase(); });
+
+
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 2000);
+}
+
 
   const freshmen = ["오서준", "김도건", "김진우", "한가은", "이다연", "김두현"];
 
@@ -304,9 +475,9 @@
                   .replaceAll(".", "").replace(" ", " (") + ")";
 
     let text = `☘️${day} 대학선교부 출석☘️\n\n`;
-    if (broFinal.length) text += `형제님🙋🏻‍♂️\n${broFinal.join(", ")}\n\n`;
-    if (sisFinal.length) text += `자매님🙋🏻‍♀️\n${sisFinal.join(", ")}\n\n`;
-    if (freshNames.length) text += `💛신입생💛\n${freshNames.join(", ")}\n\n`;
+    if (broFinal.length) text += `형제님🙋🏻‍♂️\n${formatNamesWithLineBreak(broFinal)}\n\n`;
+    if (sisFinal.length) text += `자매님🙋🏻‍♀️\n${formatNamesWithLineBreak(sisFinal)}\n\n`;
+    if (freshNames.length) text += `💛신입생💛\n${formatNamesWithLineBreak(freshNames)}\n\n`;
     if (broFinal.length) text += `형제님: ${broFinal.length}명\n`;
     if (sisFinal.length) text += `자매님: ${sisFinal.length}명\n`;
     if (freshNames.length) text += `신입생: ${freshNames.length}명\n`;
@@ -331,18 +502,22 @@
     updateSummary();
     saveToFirebase();
   };
-  document.getElementById("undoBtn").onclick = () => {
-    if (undoStack.length === 0) return;
-    redoStack.push(getCurrentState());
-    const prev = undoStack.pop();
-    applyState(prev);
-  };
-  document.getElementById("redoBtn").onclick = () => {
-    if (redoStack.length === 0) return;
-    undoStack.push(getCurrentState());
-    const next = redoStack.pop();
-    applyState(next);
-  };
+  
+document.getElementById("undoBtn").onclick = () => {
+  if (undoStack.length === 0) return showToast("되돌릴 작업이 없어요");
+  redoStack.push(getCurrentState());
+  const prev = undoStack.pop();
+  applyState(prev);
+  showToast("되돌렸어요");
+};
+  
+document.getElementById("redoBtn").onclick = () => {
+  if (redoStack.length === 0) return showToast("다시 실행할 작업이 없어요");
+  undoStack.push(getCurrentState());
+  const next = redoStack.pop();
+  applyState(next);
+  showToast("다시 실행했어요");
+};
 
   flatpickr(datePicker, {
     locale: "ko",
@@ -354,70 +529,34 @@
       currentDate = dateStr;
       fetchNames().then(() => { render(); listenToFirebase(); });
 
+
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 2000);
+}
+
+
   const freshmen = ["오서준", "김도건", "김진우", "한가은", "이다연", "김두현"];
 
-  document.getElementById("copyBtn").onclick = () => {
-    const broNames = [...document.querySelectorAll("#brothers .present")].map(el => el.textContent);
-    const sisNames = [...document.querySelectorAll("#sisters .present")].map(el => el.textContent);
-    const freshNames = [...broNames, ...sisNames].filter(name => freshmen.includes(name));
-    const broFinal = broNames.filter(name => !freshNames.includes(name));
-    const sisFinal = sisNames.filter(name => !freshNames.includes(name));
-
-    const date = new Date(currentDate);
-    const day = date.toLocaleDateString("ko-KR", { year: "2-digit", month: "2-digit", day: "2-digit", weekday: "short" })
-                  .replaceAll(".", "").replace(" ", " (") + ")";
-
-    let text = `☘️${day} 대학선교부 출석☘️\n\n`;
-    if (broFinal.length) text += `형제님🙋🏻‍♂️\n${broFinal.join(", ")}\n\n`;
-    if (sisFinal.length) text += `자매님🙋🏻‍♀️\n${sisFinal.join(", ")}\n\n`;
-    if (freshNames.length) text += `💛신입생💛\n${freshNames.join(", ")}\n\n`;
-    if (broFinal.length) text += `형제님: ${broFinal.length}명\n`;
-    if (sisFinal.length) text += `자매님: ${sisFinal.length}명\n`;
-    if (freshNames.length) text += `신입생: ${freshNames.length}명\n`;
-    const total = broFinal.length + sisFinal.length + freshNames.length;
-    text += `\n총 “${total}명” 참석하였습니다`;
-
-    navigator.clipboard.writeText(text).then(() => {
-      const toast = document.getElementById("toast");
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 2000);
-    });
-  };
 
     }
   });
 
   fetchNames().then(() => { render(); listenToFirebase(); });
 
+
+function showToast(msg) {
+  const toast = document.getElementById("toast");
+  toast.textContent = msg;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 2000);
+}
+
+
   const freshmen = ["오서준", "김도건", "김진우", "한가은", "이다연", "김두현"];
 
-  document.getElementById("copyBtn").onclick = () => {
-    const broNames = [...document.querySelectorAll("#brothers .present")].map(el => el.textContent);
-    const sisNames = [...document.querySelectorAll("#sisters .present")].map(el => el.textContent);
-    const freshNames = [...broNames, ...sisNames].filter(name => freshmen.includes(name));
-    const broFinal = broNames.filter(name => !freshNames.includes(name));
-    const sisFinal = sisNames.filter(name => !freshNames.includes(name));
-
-    const date = new Date(currentDate);
-    const day = date.toLocaleDateString("ko-KR", { year: "2-digit", month: "2-digit", day: "2-digit", weekday: "short" })
-                  .replaceAll(".", "").replace(" ", " (") + ")";
-
-    let text = `☘️${day} 대학선교부 출석☘️\n\n`;
-    if (broFinal.length) text += `형제님🙋🏻‍♂️\n${broFinal.join(", ")}\n\n`;
-    if (sisFinal.length) text += `자매님🙋🏻‍♀️\n${sisFinal.join(", ")}\n\n`;
-    if (freshNames.length) text += `💛신입생💛\n${freshNames.join(", ")}\n\n`;
-    if (broFinal.length) text += `형제님: ${broFinal.length}명\n`;
-    if (sisFinal.length) text += `자매님: ${sisFinal.length}명\n`;
-    if (freshNames.length) text += `신입생: ${freshNames.length}명\n`;
-    const total = broFinal.length + sisFinal.length + freshNames.length;
-    text += `\n총 “${total}명” 참석하였습니다`;
-
-    navigator.clipboard.writeText(text).then(() => {
-      const toast = document.getElementById("toast");
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 2000);
-    });
-  };
 
 </script>
 <div class="toast" id="toast">클립보드에 복사됨!</div>
