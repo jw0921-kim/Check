@@ -40,17 +40,19 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 6px;
 }
-    .panel {
+    
+.panel {
   flex: 1 1 clamp(220px, 30vw, 360px);
   max-width: 100%;
   background: white;
   border-radius: 12px;
-  padding: 6px 0px 10px 0px;
+  padding: 6px 4px 10px 4px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
     .panel h2 {
       margin-bottom: 4px;
       font-size: 17px;
@@ -97,24 +99,47 @@
   }
 }
 }
-    .name {
+    
+
+
+
+
+.name {
   text-align: center;
-  padding: 1px 1px;
-  border-radius: 8px;
+  padding: 5px 1px;
+  margin: 0;
+  border-radius: 6px;
   font-size: clamp(12px, 1.8vw, 16px);
   background: #f7f7f7;
   border: 1.5px solid #bbb;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.3px;
+  max-width: 100%;
+  max-height: 100%;
+  line-height: 1.1;
 }
-
+.name span {
+  display: inline-block;
+  max-width: 100%;
+  font-size: inherit;
+  transform: scaleX(1);
+}
 @media (max-height: 500px) {
   .name {
     font-size: clamp(9px, 1.2vw, 13px);
-    padding: 3px 2px;
+    padding: 4px 1px;
+    margin: 0;
+    border-radius: 6px;
+    letter-spacing: -0.3px;
   }
 }
+
+
+
+
+
     .present {
       background: #e6f4ea !important;
       border: 2px solid #81c784;
@@ -146,17 +171,19 @@ a.panel-link {
   text-decoration: none;
   color: inherit;
 }
-.panel-link .panel {
+.panel-link 
+.panel {
   flex: 1 1 clamp(220px, 30vw, 360px);
   max-width: 100%;
   background: white;
   border-radius: 12px;
-  padding: 6px 10px 10px 10px;
+  padding: 6px 4px 10px 4px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .panel-link:active .panel,
 .panel:active {
   transform: scale(0.97);
@@ -262,7 +289,7 @@ function renderAll() {
           dep.brothers.forEach((name, i) => {
             const div = document.createElement("div");
             div.className = "name";
-            div.textContent = name;
+            div.innerHTML = `<span>${name}</span>`;
             if (snap.exists() && snap.val().형제?.[i]) { div.classList.add("present"); broCount++; }
             brosDiv.appendChild(div);
           });
@@ -271,7 +298,7 @@ function renderAll() {
           dep.sisters.forEach((name, i) => {
             const div = document.createElement("div");
             div.className = "name";
-            div.textContent = name;
+            div.innerHTML = `<span>${name}</span>`;
             if (snap.exists() && snap.val().자매?.[i]) { div.classList.add("present"); sisCount++; }
             sissDiv.appendChild(div);
           });
