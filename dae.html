@@ -444,8 +444,6 @@ function loadFromFirebase() {
       defaultDate: currentDate,
       onChange: (_, dateStr) => {
         db.ref("attendance/대학부/" + currentDate).off();
-        render();
-        
         currentDate = dateStr;
         fetchNames().then(() => { render(); listenToFirebase(); });
       },
