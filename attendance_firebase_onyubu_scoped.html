@@ -117,28 +117,40 @@
       border: 1px solid #f8bbd0;
     }
 
-    .name {
+    
+.name {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 6px 4px;
-      padding: 7px;
-      text-align: center;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-size: 0.9rem;
-    }
+  padding: 7px;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    .name.present {
+.name span {
+  display: inline-block;
+  max-width: 100%;
+  font-size: inherit;
+  transform: scaleX(1);
+  letter-spacing: -0.5px;
+}
+
+
+.name.present {
   transform: scale(1.03);
   transition: transform 0.2s ease;
   color: #2e7d32 !important;
-      background: #e6f4ea !important;
-      border: 2px solid #aed581;
-      font-weight: bold;
-      color: #33691e;
-    }
+  background: #e6f4ea !important;
+  border: 2px solid #aed581;
+  font-weight: bold;
+  color: #33691e;
+}
 
     .toast {
       position: fixed;
@@ -281,7 +293,7 @@
     function createTag(name) {
       const div = document.createElement("div");
       div.className = "name";
-      div.textContent = name;
+      div.innerHTML = `<span>${name}</span>`;
       div.onclick = () => {
         pushUndoState();
         div.classList.toggle("present");
