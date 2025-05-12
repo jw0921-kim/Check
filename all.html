@@ -14,7 +14,7 @@
 <style>
     body {
       margin: 0;
-      padding: 8px;
+      padding: 8px 8px 48px 8px;
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(to right, #f3e5f5, #e3f2fd);
     }
@@ -26,10 +26,10 @@
     }
     .date-picker {
       text-align: center;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
     .date-picker input {
-      padding: 8px;
+      padding: 8px 8px 48px 8px;
       font-size: 16px;
       border-radius: 6px;
       border: 1.5px solid #bbb;
@@ -45,20 +45,20 @@
   max-width: 100%;
   background: white;
   border-radius: 12px;
-  padding: 10px;
+  padding: 6px 10px 10px 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
 }
     .panel h2 {
-      margin-bottom: 8px;
-      font-size: 18px;
+      margin-bottom: 4px;
+      font-size: 17px;
       color: #444;
     }
     .group {
       width: 100%;
-      margin: 4px 0;
+      margin: 2px 0;
     }
     .group-title {
       display: flex; align-items: baseline;
@@ -68,7 +68,7 @@
       font-size: 10px;
       font-weight: bold;
       color: #666;
-      margin: 4px 0;
+      margin: 2px 0;
     }
     .names {
   display: grid;
@@ -151,7 +151,7 @@ a.panel-link {
   max-width: 100%;
   background: white;
   border-radius: 12px;
-  padding: 10px;
+  padding: 6px 10px 10px 10px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
@@ -162,9 +162,10 @@ a.panel-link {
   transform: scale(0.97);
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
-</style></head>
+</style><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
 <body>
-<button onclick="history.back()" style="position: absolute; top: 10px; left: 10px; background: #f3f7ff; color: #37474f;
+<button onclick="history.back()" style="position: absolute; top: 6px; left: 10px; background: #f3f7ff; color: #37474f;
     border: 1px solid #cfd8dc; padding: 6px 12px; font-size: 13px; border-radius: 6px; cursor: pointer;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);">←</button>
 <div class="date-picker" style="display: flex; align-items: baseline; justify-content: center; align-items: center; gap: 8px;">
@@ -416,5 +417,49 @@ function renderAll() {
     }
 
   </script>
+
+<button onclick="captureScreen()" style="
+  position: fixed;
+  top: 8px;
+  right: 12px;
+  background: #fff3e0;
+  color: #5d4037;
+  border: 1px solid #d7ccc8;
+  padding: 7px 8px;
+  font-size: 11px;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+">화면 캡쳐</button>
+
+
+<script>
+function captureScreen() {
+  // 숨길 요소들
+  const elementsToHide = [
+    document.querySelector(".date-picker"),
+    document.querySelector("button[onclick='history.back()']"),
+    document.querySelector("button[onclick='captureScreen()']")
+  ];
+
+  // 숨김 처리
+  elementsToHide.forEach(el => { if (el) el.style.visibility = "hidden"; });
+
+  // 잠시 후 캡쳐
+  setTimeout(() => {
+    html2canvas(document.body).then(canvas => {
+      const link = document.createElement("a");
+      link.download = `attendance_${new Date().toISOString().slice(0,10)}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+
+      // 다시 보이게 복원
+      elementsToHide.forEach(el => { if (el) el.style.visibility = "visible"; });
+    });
+  }, 300);
+}
+</script>
+
 </body>
 </html>
