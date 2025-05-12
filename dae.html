@@ -338,7 +338,6 @@ function render() {
     }
 
 function loadFromFirebase() {
-      render();
       db.ref("attendance/대학부/" + currentDate).get().then(snap => {
         if (!snap.exists()) return updateSummary();
         const data = snap.val();
