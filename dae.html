@@ -204,29 +204,37 @@
       });
     }
 
+    
     document.getElementById("copyBtn").onclick = () => {
       const yy = currentDate.slice(2,4), mm = currentDate.slice(5,7), dd = currentDate.slice(8,10);
       const wd = ['일','월','화','수','목','금','토'][new Date(currentDate).getDay()];
-      const bro = [...brothersDiv.children].filter(c => c.classList.contains("present")).map(c => c.textContent);
-      const sis = [...sistersDiv.children].filter(c => c.classList.contains("present")).map(c => c.textContent);
+      const allBro = [...brothersDiv.children].filter(c => c.classList.contains("present")).map(c => c.textContent);
+      const allSis = [...sistersDiv.children].filter(c => c.classList.contains("present")).map(c => c.textContent);
       const freshmen = ["오서준", "김도건", "김진우", "한가은", "이다연", "김두현"];
-      const freshmenPresent = [...bro, ...sis].filter(n => freshmen.includes(n));
+      const freshmenPresent = [...allBro, ...allSis].filter(n => freshmen.includes(n));
+
+      const bro = allBro.filter(n => !freshmen.includes(n));
+      const sis = allSis.filter(n => !freshmen.includes(n));
 
       const lines = [];
-      lines.push(`☘️${yy}.${mm}.${dd} (${wd}) 대학선교부 출석☘️\n`);
-      lines.push(`형제님🙋🏻‍♂️\n`);
-      lines.push(bro.join(", ") + "\n");
-      lines.push(`\n자매님🙋🏻‍♀️\n`);
-      lines.push(sis.join(", ") + "\n");
-      lines.push(`\n💛신입생💛\n`);
-      lines.push(freshmenPresent.join(", ") + "\n");
-      lines.push(`\n형제님: ${bro.length}명`);
-      lines.push(`자매님: ${sis.length}명`);
-      lines.push(`신입생: ${freshmenPresent.length}명\n`);
-      lines.push(`총 “${bro.length + sis.length}명” 참석하였습니다`);
+      lines.push(`☘️${yy}.${mm}.${dd} (${wd}) 대학선교부 출석☘️`);
+      lines.push("");
 
-      navigator.clipboard.writeText(lines.join("\n")).then(() => showToast("출석 현황 복사됨!"));
+      if (bro.length > 0) lines.push(`형제님🙋🏻‍♂️ ${bro.join(", ")}`);
+      if (sis.length > 0) lines.push(`자매님🙋🏻‍♀️ ${sis.join(", ")}`);
+      if (freshmenPresent.length > 0) lines.push(`💛신입생💛 ${freshmenPresent.join(", ")}`);
+      lines.push("");
+
+      if (bro.length > 0) lines.push(`형제님: ${bro.length}명`);
+      if (sis.length > 0) lines.push(`자매님: ${sis.length}명`);
+      if (freshmenPresent.length > 0) lines.push(`신입생: ${freshmenPresent.length}명`);
+      lines.push("");
+      lines.push(`총 “${bro.length + sis.length + freshmenPresent.length}명” 참석하였습니다`);
+
+      navigator.clipboard.writeText(lines.join("
+")).then(() => showToast("출석 현황 복사됨!"));
     };
+
 
     function showToast(message) {
       const toast = document.createElement("div");
