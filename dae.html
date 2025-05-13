@@ -148,7 +148,7 @@
 </head>
 <body>
 <button class="back-btn" onclick="history.back()">← 뒤로가기</button>
-<h1>📋 대학부</h1>
+<h1>📋 대학선교부</h1>
 <div class="top-controls">
 <button id="prevDay">◀</button>
 <input id="datePicker" type="text"/>
@@ -278,7 +278,7 @@ document.getElementById('copyBtn').onclick = () => {
   let h1Text = document.querySelector('h1').textContent;
   let deptMatch = h1Text.match(/([가-힣]+부)/);
   let dept = deptMatch ? deptMatch[1] : '';
-  const header = `☘️${yy}.${mm}.${dd} (${dow}) ${dept} 출석☘️`;
+  const header = `☘️${yy}.${mm}.${dd}(${dow}) ${dept} 출석☘️`;
 
   let broNames = [...brothersDiv.children].filter(c=>c.classList.contains('present')).map(c=>c.textContent);
   let sisNames = [...sistersDiv.children].filter(c=>c.classList.contains('present')).map(c=>c.textContent);
