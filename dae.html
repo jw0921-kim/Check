@@ -1,14 +1,15 @@
-<!DOCTYPE html><html lang="ko">
+<!DOCTYPE html>
+<html lang="ko">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>출석부 Firebase 연동</title>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet"/>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>출석부 Firebase 연동</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+<style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(to right, #e3f2fd 0%, #fff0f5 100%);
@@ -146,32 +147,32 @@
   </style>
 </head>
 <body>
-  <button class="back-btn" onclick="history.back()">← 뒤로가기</button>
-  <h1>📋 대학부</h1>
-  <div class="top-controls">
-    <button id="prevDay">◀</button>
-    <input id="datePicker" type="text"/>
-    <button id="nextDay">▶</button>
-  </div>
-  <div class="summary" id="summary">총 출석: 0명</div>
-  <div class="group-container">
-    <div class="group">
-      <h2>형제 <span id="broCount"></span></h2>
-      <div class="names" id="brothers"></div>
-    </div>
-    <div class="group">
-      <h2>자매 <span id="sisCount"></span></h2>
-      <div class="names" id="sisters"></div>
-    </div>
-  </div>
-  <div class="bottom-controls">
-    <button id="clearAllBtn">전체 선택 해제</button>
-    <button id="undoBtn">되돌리기</button>
-    <button id="redoBtn">다시 실행</button>
-  </div>
-  <button id="copyBtn" class="copy-btn">복사</button>
-  <div class="toast" id="toast">클립보드에 복사됨!</div>
-  <script>
+<button class="back-btn" onclick="history.back()">← 뒤로가기</button>
+<h1>📋 대학부</h1>
+<div class="top-controls">
+<button id="prevDay">◀</button>
+<input id="datePicker" type="text"/>
+<button id="nextDay">▶</button>
+</div>
+<div class="summary" id="summary">총 출석: 0명</div>
+<div class="group-container">
+<div class="group">
+<h2>형제 <span id="broCount"></span></h2>
+<div class="names" id="brothers"></div>
+</div>
+<div class="group">
+<h2>자매 <span id="sisCount"></span></h2>
+<div class="names" id="sisters"></div>
+</div>
+</div>
+<div class="bottom-controls">
+<button id="clearAllBtn">전체 선택 해제</button>
+<button id="undoBtn">되돌리기</button>
+<button id="redoBtn">다시 실행</button>
+</div>
+<button class="copy-btn" id="copyBtn">복사</button>
+<div class="toast" id="toast">클립보드에 복사됨!</div>
+<script>
     const firebaseConfig = {
       apiKey: "AIzaSyDrHDHrYO2Z8tWmWRgWYcN4nWHwALZ4c0s",
       authDomain: "attendance-6b1b6.firebaseapp.com",
@@ -267,31 +268,41 @@
       if (!redoStack.length) return showToast("다시 실행할 작업이 없어요");
       undoStack.push(getCurrentState()); applyState(redoStack.pop()); showToast("다시 실행했어요");
     };
-    document.getElementById('copyBtn').onclick = () => {
-      const date = new Date(currentDate);
-      const yy = String(date.getFullYear()).slice(2);
-      const mm = String(date.getMonth()+1).padStart(2,'0');
-      const dd = String(date.getDate()).padStart(2,'0');
-      const days = ['일','월','화','수','목','금','토'];
-      const dow = days[date.getDay()];
-      let h1Text = document.querySelector('h1').textContent;
-      let deptMatch = h1Text.match(/([가-힣]+부)/);
-      let dept = deptMatch ? deptMatch[1] : '';
-      const header = `☘️${yy}.${mm}.${dd} (${dow}) ${dept} 출석☘️`;
-      let broNames = [...brothersDiv.children].filter(c=>c.classList.contains('present')).map(c=>c.textContent).join(', ');
-      let sisNames = [...sistersDiv.children].filter(c=>c.classList.contains('present')).map(c=>c.textContent).join(', ');
-      let broCnt = broNames ? [...brothersDiv.children].filter(c=>c.classList.contains('present')).length : 0;
-      let sisCnt = sisNames ? [...sistersDiv.children].filter(c=>c.classList.contains('present')).length : 0;
-      let text = `${header}\n\n`;
-      if (broNames) text += `형제님🙋🏻‍♂️\n\n${broNames}\n\n`;
-      if (sisNames) text += `자매님🙋🏻‍♀️\n\n${sisNames}\n\n`;
-      let counts = [];
-      if (broNames) counts.push(`형제님: ${broCnt}명`);
-      if (sisNames) counts.push(`자매님: ${sisCnt}명`);
-      text += counts.join('\n') + '\n\n';
-      text += `총 “${broCnt + sisCnt}명” 참석하였습니다`;
-      navigator.clipboard.writeText(text).then(()=>showToast('복사되었습니다'));
-    };
+document.getElementById('copyBtn').onclick = () => {
+  const date = new Date(currentDate);
+  const yy = String(date.getFullYear()).slice(2);
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const days = ['일','월','화','수','목','금','토'];
+  const dow = days[date.getDay()];
+  let h1Text = document.querySelector('h1').textContent;
+  let deptMatch = h1Text.match(/([가-힣]+부)/);
+  let dept = deptMatch ? deptMatch[1] : '';
+  const header = `☘️${yy}.${mm}.${dd} (${dow}) ${dept} 출석☘️`;
+
+  let broNames = [...brothersDiv.children].filter(c=>c.classList.contains('present')).map(c=>c.textContent);
+  let sisNames = [...sistersDiv.children].filter(c=>c.classList.contains('present')).map(c=>c.textContent);
+
+  const freshmen = ['김도건', '김진우', '김두현', '오서준', '한가은', '이다연'];
+  let freshNames = [...broNames, ...sisNames].filter(n => freshmen.includes(n));
+  broNames = broNames.filter(n => !freshNames.includes(n));
+  sisNames = sisNames.filter(n => !freshNames.includes(n));
+
+  const formatList = list => list.map((v, i) => (i && i % 5 === 0 ? '\n' : '') + v).join(', ');
+
+  let text = `${header}\n\n`;
+  if (broNames.length) text += `형제님🙋🏻‍♂️\n\n${formatList(broNames)}\n\n`;
+  if (sisNames.length) text += `자매님🙋🏻‍♀️\n\n${formatList(sisNames)}\n\n`;
+  if (freshNames.length) text += `💛신입생💛\n\n${formatList(freshNames)}\n\n`;
+
+  if (broNames.length) text += `형제님: ${broNames.length}명\n`;
+  if (sisNames.length) text += `자매님: ${sisNames.length}명\n`;
+  if (freshNames.length) text += `신입생: ${freshNames.length}명\n\n`;
+
+  text += `총 “${broNames.length + sisNames.length + freshNames.length}명” 참석하였습니다`;
+
+  navigator.clipboard.writeText(text).then(() => showToast('복사되었습니다'));
+};
     flatpickr(datePicker, {
       locale: "ko", dateFormat: "Y-m-d", defaultDate: currentDate,
       onChange: (_, dateStr) => {
