@@ -35,11 +35,14 @@
       border: 1.5px solid #bbb;
       text-align: center;
     }
-    .dashboard {
+    
+.dashboard {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  justify-content: center;
 }
+
     
 .panel {
   flex: 1 1 clamp(220px, 30vw, 360px);
@@ -79,11 +82,7 @@
   justify-content: center;
 }
 
-@media (max-height: 500px) {
-  .names {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+
 }
 @media (min-height: 501px) {
   .names {
@@ -93,47 +92,58 @@
   justify-content: center;
 }
 
-@media (max-height: 500px) {
-  .names {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+
 }
     
 
 
 
 
+
 .name {
   text-align: center;
-  padding: 5px 1px;
+  padding: 8px 2px;
   margin: 0;
   border-radius: 6px;
-  font-size: clamp(12px, 1.8vw, 16px);
+  font-size: clamp(14px, 2vw, 20px);
   background: #f7f7f7;
   border: 1.5px solid #bbb;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.2px;
   max-width: 100%;
   max-height: 100%;
-  line-height: 1.1;
+  line-height: 1.3;
 }
+
+
 .name span {
   display: inline-block;
   max-width: 100%;
   font-size: inherit;
   transform: scaleX(1);
 }
+
 @media (max-height: 500px) {
-  .name {
-    font-size: clamp(9px, 1.2vw, 13px);
-    padding: 4px 1px;
-    margin: 0;
-    border-radius: 6px;
-    letter-spacing: -0.3px;
-  }
+  
+.name {
+  text-align: center;
+  padding: 8px 2px;
+  margin: 0;
+  border-radius: 6px;
+  font-size: clamp(14px, 2vw, 20px);
+  background: #f7f7f7;
+  border: 1.5px solid #bbb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.2px;
+  max-width: 100%;
+  max-height: 100%;
+  line-height: 1.3;
+}
+
 }
 
 
@@ -146,7 +156,56 @@
       color: #2e7d32;
       font-weight: bold;
     }
-  </style>
+  
+@media (orientation: portrait) {
+  .name {
+    font-size: clamp(12px, 1.5vw, 16px);
+    padding: 4px 2px;
+    line-height: 1.1;
+  }
+}
+}
+
+
+@media (orientation: landscape) {
+  div[style*="전체출석현황"] {
+    font-size: 26px !important;
+  }
+}
+
+
+@media (orientation: landscape) {
+  div[style*="전체출석현황"] {
+    font-size: 32px !important;
+    margin-top: 6px !important;
+  }
+}
+
+
+@media (orientation: landscape) {
+  .main-title {
+    font-size: 32px !important;
+    margin-top: 8px !important;
+  }
+}
+
+
+@media (orientation: landscape) {
+  .panel h2 {
+    font-size: 20px !important;
+  }
+  .panel h2 span {
+    font-size: 14px !important;
+  }
+  .group-title {
+    font-size: 13px !important;
+  }
+  #totalSummary {
+    font-size: 16px !important;
+  }
+}
+
+</style>
 <style>#datePicker {
   height: 26px !important;
   width: 80px !important;
@@ -200,8 +259,7 @@ a.panel-link {
 <input id="datePicker" style="width: 30px; font-size: 11px; padding: 1px;" type="text"/>
 <button id="nextDay" style="padding: 4px 6px; font-size: 12px;">▶</button>
 </div>
-<div style="display: flex; justify-content: center; position: relative; font-size: 20px; font-weight: bold; margin-top: 4px;">
-      전체출석현황
+<div style="display: flex; justify-content: center; position: relative; font-size: 20px; font-weight: bold; margin-top: 4px;" class="main-title">전체출석현황
       <div style="position: absolute; right: 1px; top: 2px; right: 0; text-align: right; font-size: 13px; font-weight: normal;"> </div>
 </div>
 <div id="totalSummary" style="text-align: right; font-size: 13px; color: #555; margin: 2px 4px 6px 0; "></div>
