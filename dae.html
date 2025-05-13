@@ -288,7 +288,7 @@ document.getElementById('copyBtn').onclick = () => {
   broNames = broNames.filter(n => !freshNames.includes(n));
   sisNames = sisNames.filter(n => !freshNames.includes(n));
 
-  const formatList = list => list.map((v, i) => (i && i % 5 === 0 ? '\n' : '') + v).join(', ');
+  const formatList = list => list.map((v, i) => (i && i % 5 === 0 ? '\n' + v : v)).join(', ');
 
   let text = `${header}\n\n`;
   if (broNames.length) text += `형제님🙋🏻‍♂️\n\n${formatList(broNames)}\n\n`;
@@ -297,8 +297,10 @@ document.getElementById('copyBtn').onclick = () => {
 
   if (broNames.length) text += `형제님: ${broNames.length}명\n`;
   if (sisNames.length) text += `자매님: ${sisNames.length}명\n`;
-  if (freshNames.length) text += `신입생: ${freshNames.length}명\n\n`;
+  if (freshNames.length) text += `신입생: ${freshNames.length}명\n`;
 
+  text += `
+`;
   text += `총 “${broNames.length + sisNames.length + freshNames.length}명” 참석하였습니다`;
 
   navigator.clipboard.writeText(text).then(() => showToast('복사되었습니다'));
