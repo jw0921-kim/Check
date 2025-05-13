@@ -205,6 +205,14 @@
   }
 }
 
+
+@media (orientation: landscape) {
+  #dateDisplay {
+    font-size: 22px !important;
+  letter-spacing: 1.2px !important;
+  }
+}
+
 </style>
 <style>#datePicker {
   height: 26px !important;
@@ -251,6 +259,7 @@ a.panel-link {
 </style><script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
+<div id="dateDisplay" style="position: absolute; top: 36px; left: 50%; transform: translateX(-45%); font-size: 18px; font-weight: bold; visibility: hidden; z-index: 9999;position: absolute; top: 28px; left: 50%; transform: translateX(-50%); font-size: 18px; font-weight: bold; visibility: hidden; z-index: 9999;position: absolute; top: 4px; left: 50%; transform: translateX(-50%); font-size: 14px; font-weight: normal; visibility: hidden; z-index: 9999;"></div>
 <button onclick="history.back()" style="position: absolute; top: 6px; left: 10px; background: #f3f7ff; color: #37474f;
     border: 1px solid #cfd8dc; padding: 6px 12px; font-size: 13px; border-radius: 6px; cursor: pointer;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);">←</button>
@@ -260,8 +269,7 @@ a.panel-link {
 <button id="nextDay" style="padding: 4px 6px; font-size: 12px;">▶</button>
 </div>
 <div style="display: flex; justify-content: center; position: relative; font-size: 20px; font-weight: bold; margin-top: 4px;" class="main-title">전체출석현황
-      <div style="position: absolute; right: 1px; top: 2px; right: 0; text-align: right; font-size: 13px; font-weight: normal;"> </div>
-</div>
+      </div>
 <div id="totalSummary" style="text-align: right; font-size: 13px; color: #555; margin: 2px 4px 6px 0; "></div>
 <div class="dashboard" id="dashboard">
 <!-- Panels inserted by JS -->
@@ -282,7 +290,7 @@ a.panel-link {
     let departments = [];
 
     const dashboard = document.getElementById("dashboard");
-    let selectedDate = new Date().toISOString().split("T")[0];
+    window.selectedDate = new Date().toISOString().split("T")[0];
 
     
     
@@ -395,6 +403,8 @@ function renderAll() {
       dateFormat: "Y-m-d",
       defaultDate: selectedDate,
       onChange: function(_, dateStr) {
+        window.selectedDate = dateStr;
+        document.getElementById("dateDisplay").textContent = formatDateWithDay(dateStr);
         selectedDate = dateStr;
         loadDepartments();
     // Total summary calculation
@@ -530,6 +540,7 @@ function captureScreen() {
 
   // 숨김 처리
   elementsToHide.forEach(el => { if (el) el.style.visibility = "hidden"; });
+  const dateEl = document.getElementById("dateDisplay"); if (dateEl) dateEl.style.visibility = "visible";
 
   // 잠시 후 캡쳐
   setTimeout(() => {
@@ -541,9 +552,26 @@ function captureScreen() {
 
       // 다시 보이게 복원
       elementsToHide.forEach(el => { if (el) el.style.visibility = "visible"; });
+      if (dateEl) dateEl.style.visibility = "hidden";
     });
   }, 300);
 }
+</script>
+
+
+<script>
+function formatDateWithDay(dateStr) {
+  const date = new Date(dateStr);
+  const days = ['일','월','화','수','목','금','토'];
+  const day = days[date.getDay()];
+  return dateStr + `(${day})`;
+}
+document.addEventListener("DOMContentLoaded", () => {
+  const display = document.getElementById("dateDisplay");
+  if (display && window.selectedDate) {
+    display.textContent = formatDateWithDay(window.selectedDate);
+  }
+});
 </script>
 
 </body>
