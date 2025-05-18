@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>2025년 토/일 출석률 통계</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; padding: 20px; background: #f4f6f8; color: #333; }
+    h1 { text-align: center; margin-bottom: 20px; }
+    h2 { color: #2c3e50; margin-top: 30px; }
+    table { border-collapse: collapse; width: 100%; max-width: 720px; margin-bottom: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; font-size: 14px; }
+    th { background: #eee; }
+    tr:nth-child(even) { background: #fafafa; }
+  </style>
+</head>
+<body>
+  <h1>2025년 토요일 / 일요일 출석률</h1>
+  <div id="results"></div>
+
+  <script>
+    const config = {
+      apiKey: "AIzaSyDrHDHrYO2Z8tWmWRgWYcN4nWHwALZ4c0s",
+      authDomain: "attendance-6b1b6.firebaseapp.com",
+      databaseURL: "https://attendance-6b1b6-default-rtdb.firebaseio.com",
+      projectId: "attendance-6b1b6",
+    };
+    firebase.initializeApp(config);
+    const db = firebase.database();
+
+    const depts = ["겸손부", "온유부", "사랑부"];
+    const customLists = {
+      "겸손부": {
+        형제: ["이태섭", "김진우", "이동환", "김지석", "전도영", "김권비", "김민호", "남준혁", "최재혁", "김인수", "문지훈", "전호성", "박지웅", "김두현", "박효원"],
+        자매: ["전효진", "고다영", "남소연", "김유나", "정여진", "심규리", "김민서", "박지혜", "심재경", "유지연", "심예림", "이소희", "임도해", "이현화", "김소은", "김이안"]
+      },
+      "온유부": {
+        형제: ["양인수", "김호진", "이상수", "정형기", "박수용", "고병인", "이동길", "정인교", "권세빈", "김용빈", "김승후", "홍정의", "김민성", "하현성", "김진우2", "전은섭"],
+        자매: ["김유진", "이지희", "김민지", "임윤지", "박다은", "유재나", "김세연", "김채연", "임민해", "한예은", "임연주", "최연서", "한가은"]
+      },
+      "사랑부": {
+        형제: ["신창현", "임우혁", "정용진", "강민구", "노현준", "양홍열", "김해원", "백진호", "김교식", "이신섭", "조시형", "임향원", "심어진", "오서준", "임주용", "김도건", "이준희"],
+        자매: ["김혜련", "강민지", "최선영", "정희주", "박나은", "라유리", "하지원", "김호연", "유승비", "김주연", "강다빈", "이주화", "양정민", "한다빈", "유현지", "이다연"]
+      }
+    };
+
+    const weekends = {"토": [], "일": []};
+    const start = new Date("2025-01-01"), end = new Date("2025-12-31");
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const wd = d.getDay();
+      const key = d.toISOString().split('T')[0];
+      if (wd === 6) weekends["토"].push(key);
+      else if (wd === 0) weekends["일"].push(key);
+    }
+
+    async function loadAll() {
+      const container = document.getElementById("results");
+      for (const dept of depts) {
+        const bros = customLists[dept].형제;
+        const siss = customLists[dept].자매;
+        const broStats = {}, sisStats = {};
+
+        for (const name of bros) broStats[name] = {"토": {c: 0, t: 0}, "일": {c: 0, t: 0}};
+        for (const name of siss) sisStats[name] = {"토": {c: 0, t: 0}, "일": {c: 0, t: 0}};
+
+        for (const day of weekends["토"]) {
+          const snap = await db.ref(`attendance/${dept}/${day}/형제`).get();
+          const arr = snap.val() || [];
+          bros.forEach((n, i) => { broStats[n]["토"].t++; if (arr[i]) broStats[n]["토"].c++; });
+
+          const snap2 = await db.ref(`attendance/${dept}/${day}/자매`).get();
+          const arr2 = snap2.val() || [];
+          siss.forEach((n, i) => { sisStats[n]["토"].t++; if (arr2[i]) sisStats[n]["토"].c++; });
+        }
+
+        for (const day of weekends["일"]) {
+          const snap = await db.ref(`attendance/${dept}/${day}/형제`).get();
+          const arr = snap.val() || [];
+          bros.forEach((n, i) => { broStats[n]["일"].t++; if (arr[i]) broStats[n]["일"].c++; });
+
+          const snap2 = await db.ref(`attendance/${dept}/${day}/자매`).get();
+          const arr2 = snap2.val() || [];
+          siss.forEach((n, i) => { sisStats[n]["일"].t++; if (arr2[i]) sisStats[n]["일"].c++; });
+        }
+
+        container.innerHTML += makeTable(`${dept} 형제`, broStats);
+        container.innerHTML += makeTable(`${dept} 자매`, sisStats);
+      }
+    }
+
+    function makeTable(title, stats) {
+      let html = `<h2>${title}</h2><table><tr><th>이름</th><th>토요일</th><th>일요일</th></tr>`;
+      const sorted = Object.entries(stats).sort(([a], [b]) => a.localeCompare(b));
+      for (const [name, rec] of sorted) {
+        const t = rec["토"], i = rec["일"];
+        const tr = `${t.c}/${t.t} (${Math.round(t.c/t.t*100)||0}%)`;
+        const ir = `${i.c}/${i.t} (${Math.round(i.c/i.t*100)||0}%)`;
+        html += `<tr><td>${name}</td><td>${tr}</td><td>${ir}</td></tr>`;
+      }
+      return html + '</table>';
+    }
+
+    loadAll();
+  </script>
+</body>
+</html>
