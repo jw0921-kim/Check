@@ -579,6 +579,33 @@ document.addEventListener("DOMContentLoaded", () => {
     display.textContent = formatDateWithDay(window.selectedDate);
   }
 });
+
+// 스와이프 이벤트 추가
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.addEventListener('touchstart', function(e) {
+  touchStartX = e.changedTouches[0].screenX;
+}, false);
+
+document.addEventListener('touchend', function(e) {
+  touchEndX = e.changedTouches[0].screenX;
+  handleSwipeGesture();
+}, false);
+
+function handleSwipeGesture() {
+  const swipeDistance = touchEndX - touchStartX;
+  if (Math.abs(swipeDistance) > 50) { // 최소 스와이프 거리
+    if (swipeDistance > 0) {
+      // 오른쪽 스와이프 → 이전 날짜
+      changeDate(-1);
+    } else {
+      // 왼쪽 스와이프 → 다음 날짜
+      changeDate(1);
+    }
+  }
+}
+
 </script>
 
 </body>
