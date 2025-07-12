@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>출석부 인원 관리</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    select, input, button {
+      font-size: 16px;
+      padding: 6px;
+      margin: 5px;
+    }
+    .log {
+      margin-top: 20px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <h1>출석부 인원 추가/삭제</h1>
+
+  <div>
+    <label>부서:
+      <select id="department">
+        <option>겸손부</option>
+        <option>온유부</option>
+        <option>사랑부</option>
+      </select>
+    </label>
+    <label>성별:
+      <select id="gender">
+        <option>형제</option>
+        <option>자매</option>
+      </select>
+    </label>
+    <input type="text" id="name" placeholder="이름 입력" />
+    <input type="password" id="password" placeholder="비밀번호" />
+    <br/>
+    <button onclick="addPerson()">+ 추가</button>
+    <button onclick="removePerson()">삭제</button>
+  </div>
+
+  <div class="log" id="log"></div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDrHDHrYO2Z8tWmWRgWYcN4nWHwALZ4c0s",
+      authDomain: "attendance-6b1b6.firebaseapp.com",
+      databaseURL: "https://attendance-6b1b6-default-rtdb.firebaseio.com",
+      projectId: "attendance-6b1b6",
+      storageBucket: "attendance-6b1b6.appspot.com",
+      messagingSenderId: "808077953334",
+      appId: "1:808077953334:web:238afede21744aee6f8b97"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function getInputs() {
+      const department = document.getElementById("department").value;
+      const gender = document.getElementById("gender").value;
+      const name = document.getElementById("name").value.trim();
+      const pw = document.getElementById("password").value;
+      return { department, gender, name, pw };
+    }
+
+    function logMessage(msg, color = "green") {
+      const log = document.getElementById("log");
+      log.style.color = color;
+      log.textContent = msg;
+    }
+
+    function addPerson() {
+      const { department, gender, name, pw } = getInputs();
+      if (pw !== "9191") return logMessage("비밀번호가 틀렸습니다.", "red");
+      if (!name) return logMessage("이름을 입력하세요.", "red");
+
+      const ref = db.ref(`attendance/${department}/명단/${gender}`);
+      ref.once("value").then(snapshot => {
+        const list = snapshot.val() || [];
+        list.push(name);
+        ref.set(list).then(() => {
+          logMessage(`${name}님이 ${department} ${gender}에 추가되었습니다.`);
+        });
+      });
+    }
+
+    function removePerson() {
+      const { department, gender, name, pw } = getInputs();
+      if (pw !== "9191") return logMessage("비밀번호가 틀렸습니다.", "red");
+      if (!name) return logMessage("삭제할 이름을 입력하세요.", "red");
+
+      const ref = db.ref(`attendance/${department}/명단/${gender}`);
+      ref.once("value").then(snapshot => {
+        let list = snapshot.val() || [];
+        const index = list.indexOf(name);
+        if (index === -1) return logMessage(`${name}님을 찾을 수 없습니다.`, "red");
+        list.splice(index, 1);
+        ref.set(list).then(() => {
+          logMessage(`${name}님이 ${department} ${gender}에서 삭제되었습니다.`);
+        });
+      });
+    }
+  </script>
+</body>
+</html>
