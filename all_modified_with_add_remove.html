@@ -275,7 +275,7 @@ a.panel-link {
 <input id="datePicker" style="width: 30px; font-size: 11px; padding: 1px;" type="text"/>
 <button id="nextDay" style="padding: 4px 6px; font-size: 12px;">▶</button>
 </div>
-<div style="display: flex; justify-content: center; position: relative; font-size: 20px; font-weight: bold; margin-top: 4px;" class="main-title">전체출석현황
+<div class="main-title" style="display: flex; justify-content: center; position: relative; font-size: 20px; font-weight: bold; margin-top: 4px;">전체출석현황
       </div>
 <div id="totalSummary" style="text-align: right; font-size: 13px; color: #555; margin: 2px 4px 6px 0; "></div>
 <div class="dashboard" id="dashboard">
@@ -345,6 +345,13 @@ function renderAll() {
               <div class="names" id="${dep.name}_siss"></div>
             </div>
           </div>
+
+<div style="margin-top: 8px; text-align: center;">
+  <button onclick="addPerson(dep.name, '형제')">+ 형제 추가</button>
+  <button onclick="addPerson(dep.name, '자매')">+ 자매 추가</button>
+  <button onclick="removePerson(dep.name, '형제')">형제 삭제</button>
+  <button onclick="removePerson(dep.name, '자매')">자매 삭제</button>
+</div>
         `;
         panelLink.appendChild(panel);
         dashboard.appendChild(panelLink);
@@ -519,7 +526,6 @@ function renderAll() {
     }
 
   </script>
-
 <button onclick="captureScreen()" style="
   position: fixed;
   top: 8px;
@@ -534,8 +540,6 @@ function renderAll() {
   z-index: 9999;
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 ">화면 캡쳐</button>
-
-
 <script>
 function captureScreen() {
   // 숨길 요소들
@@ -564,8 +568,6 @@ function captureScreen() {
   }, 300);
 }
 </script>
-
-
 <script>
 function formatDateWithDay(dateStr) {
   const date = new Date(dateStr);
@@ -667,8 +669,6 @@ function removePerson(department, gender) {
     });
   });
 }
-</script>
-
 </script>
 
 </body>
