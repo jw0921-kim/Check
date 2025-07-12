@@ -80,7 +80,7 @@
     }
 
     function loadList() {
-      const path = ref(db, basePath + "/people");
+      const path = ref(db, "attendance/" + basePath + "/명단/" + gender);
       onValue(path, snapshot => {
         const data = snapshot.val();
         deleteList.innerHTML = "";
@@ -93,11 +93,12 @@
       });
     }
 
-    window.addPerson = function() {
+    window.addPerson = function () {
+  console.log('addPerson clicked');
       const name = nameInput.value.trim();
       const gender = genderSelect.value;
       if (!name) return alert("이름을 입력하세요.");
-      set(ref(db, basePath + "/people/" + name), {
+      set(ref(db, "attendance/" + basePath + "/명단/" + gender + "/" + name), {
         gender: gender
       }).then(() => {
         alert("추가 완료");
@@ -106,10 +107,11 @@
       });
     }
 
-    window.deletePerson = function() {
+    window.deletePerson = function () {
+  console.log('deletePerson clicked');
       const name = deleteList.value;
       if (!name) return alert("삭제할 인원을 선택하세요.");
-      remove(ref(db, basePath + "/people/" + name)).then(() => {
+      remove(ref(db, "attendance/" + basePath + "/명단/" + gender + "/" + name)).then(() => {
         alert("삭제 완료");
         loadList();
       });
