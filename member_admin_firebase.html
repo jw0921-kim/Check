@@ -26,9 +26,24 @@
       margin-top: 20px;
       color: green;
     }
+    #passwordOverlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: white;
+      z-index: 9999;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
   </style>
 </head>
 <body>
+  <div id="passwordOverlay">
+    <h2>비밀번호를 입력하세요</h2>
+    <input type="password" id="entryPassword" placeholder="비밀번호" style="font-size: 16px; padding: 8px;" />
+    <button onclick="checkPassword()" style="margin-top: 10px; font-size: 16px;">확인</button>
+    <p id="pwError" style="color:red; margin-top:10px;"></p>
+  </div>
+
   <h1>출석부 인원 추가/삭제</h1>
 
   <div>
@@ -66,6 +81,16 @@
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+
+    function checkPassword() {
+      const pw = document.getElementById("entryPassword").value;
+      const errorMsg = document.getElementById("pwError");
+      if (pw === "9191") {
+        document.getElementById("passwordOverlay").style.display = "none";
+      } else {
+        errorMsg.textContent = "비밀번호가 틀렸습니다.";
+      }
+    }
 
     function getInputs() {
       const department = document.getElementById("department").value;
