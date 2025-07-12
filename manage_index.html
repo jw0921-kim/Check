@@ -1,0 +1,58 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>부서별 인원 관리</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e8f5e9, #f1f8e9);
+      margin: 0;
+      padding: 40px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      font-size: 24px;
+      color: #2e7d32;
+      margin-bottom: 30px;
+      font-weight: 600;
+    }
+    .button-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 300px;
+      width: 100%;
+    }
+    button {
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 500;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #81c784, #66bb6a);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(102, 187, 106, 0.3);
+      transition: all 0.25s ease;
+    }
+    button:hover {
+      background: linear-gradient(135deg, #388e3c, #2e7d32);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <h1>📌 부서별 인원 관리</h1>
+  <div class="button-container">
+    <button onclick="location.href='manage_gyeomsonbu.html'">겸손부</button>
+    <button onclick="location.href='manage_onyubu.html'">온유부</button>
+    <button onclick="location.href='manage_sarangbu.html'">사랑부</button>
+    <button onclick="location.href='manage_dae.html'">대학부</button>
+  </div>
+</body>
+</html>
