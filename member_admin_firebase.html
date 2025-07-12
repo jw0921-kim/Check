@@ -1,14 +1,13 @@
 
 <!DOCTYPE html>
-
 <html lang="ko">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>출석부 인원 관리</title>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>출석부 인원 관리</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background: #f0f4f8;
@@ -30,46 +29,32 @@
   </style>
 </head>
 <body>
-<h1>출석부 인원 추가/삭제</h1>
-<div>
-<label>부서:
-      <select id="department">
-<option>겸손부</option>
-<option>온유부</option>
-<option>사랑부</option>
-</select>
-</label>
-<label>성별:
-      <select id="gender">
-<option>형제</option>
-<option>자매</option>
-</select>
-</label>
-<input id="name" placeholder="이름 입력" type="text"/>
-<input id="password" placeholder="비밀번호" type="password"/>
-<br/>
-<button onclick="addPerson()">+ 추가</button>
-<button onclick="removePerson()">삭제</button>
-</div>
-<h2>인원 순서 변경</h2>
+  <h1>출석부 인원 추가/삭제</h1>
 
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-<h2>명단 드래그로 순서 변경</h2>
-<div id="nameList" style="display:inline-block; text-align:left; margin: 10px auto; padding:10px; background:#fff; border:1px solid #ccc; min-width:180px;"></div>
-<button onclick="applyDragOrder()">💾 순서 저장</button>
-<div>
-<label>기존 인덱스 (0부터):
-    <input id="fromIndex" style="width: 60px;" type="number"/>
-</label>
-<label>이동할 인덱스:
-    <input id="toIndex" style="width: 60px;" type="number"/>
-</label>
-<br/>
-<input id="sortPassword" placeholder="비밀번호" type="password"/>
-<button onclick="reorderNames()">순서 변경</button>
-</div>
-<div class="log" id="log"></div>
-<script>
+  <div>
+    <label>부서:
+      <select id="department">
+        <option>겸손부</option>
+        <option>온유부</option>
+        <option>사랑부</option>
+      </select>
+    </label>
+    <label>성별:
+      <select id="gender">
+        <option>형제</option>
+        <option>자매</option>
+      </select>
+    </label>
+    <input type="text" id="name" placeholder="이름 입력" />
+    <input type="password" id="password" placeholder="비밀번호" />
+    <br/>
+    <button onclick="addPerson()">+ 추가</button>
+    <button onclick="removePerson()">삭제</button>
+  </div>
+
+  <div class="log" id="log"></div>
+
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDrHDHrYO2Z8tWmWRgWYcN4nWHwALZ4c0s",
       authDomain: "attendance-6b1b6.firebaseapp.com",
@@ -129,111 +114,6 @@
         });
       });
     }
-  
-function reorderNames() {
-  const department = document.getElementById("department").value;
-  const gender = document.getElementById("gender").value;
-  const from = parseInt(document.getElementById("fromIndex").value);
-  const to = parseInt(document.getElementById("toIndex").value);
-  const pw = document.getElementById("sortPassword").value;
-  if (pw !== "9191") return logMessage("비밀번호가 틀렸습니다.", "red");
-
-  const nameRef = db.ref(`attendance/${department}/명단/${gender}`);
-  nameRef.once("value").then(snapshot => {
-    let nameList = snapshot.val() || [];
-    if (from < 0 || from >= nameList.length || to < 0 || to >= nameList.length) {
-      return logMessage("인덱스가 범위를 벗어났습니다.", "red");
-    }
-
-    const [moved] = nameList.splice(from, 1);
-    nameList.splice(to, 0, moved);
-    nameRef.set(nameList).then(() => {
-      // 날짜별 출석 정보 순서도 동일하게 바꿈
-      db.ref(`attendance/${department}`).once("value").then(fullSnap => {
-        const updates = {};
-        fullSnap.forEach(dateSnap => {
-          const date = dateSnap.key;
-          const attendanceList = dateSnap.val()?.[gender];
-          if (Array.isArray(attendanceList)) {
-            let reordered = [...attendanceList];
-            const [val] = reordered.splice(from, 1);
-            reordered.splice(to, 0, val);
-            updates[`attendance/${department}/${date}/${gender}`] = reordered;
-          }
-        });
-
-        db.ref().update(updates).then(() => {
-          logMessage("순서가 성공적으로 변경되었습니다.");
-        });
-      });
-    });
-  });
-}
-
-function loadAndRenderNames() {
-  const department = document.getElementById("department").value;
-  const gender = document.getElementById("gender").value;
-  const listRef = db.ref(`attendance/${department}/명단/${gender}`);
-  listRef.once("value").then(snapshot => {
-    const list = snapshot.val() || [];
-    const container = document.getElementById("nameList");
-    container.innerHTML = "";
-    list.forEach(name => {
-      const div = document.createElement("div");
-      div.textContent = name;
-      div.className = "draggable";
-      div.style.padding = "4px";
-      div.style.border = "1px solid #ddd";
-      div.style.margin = "2px 0";
-      div.style.background = "#fafafa";
-      container.appendChild(div);
-    });
-  });
-}
-
-function applyDragOrder() {
-  const pw = prompt("비밀번호를 입력하세요:");
-  if (pw !== "9191") return logMessage("비밀번호가 틀렸습니다.", "red");
-
-  const department = document.getElementById("department").value;
-  const gender = document.getElementById("gender").value;
-  const container = document.getElementById("nameList");
-  const newList = Array.from(container.children).map(div => div.textContent);
-
-  db.ref(`attendance/${department}/명단/${gender}`).set(newList).then(() => {
-    // 날짜별 출석 순서도 수정
-    db.ref(`attendance/${department}`).once("value").then(fullSnap => {
-      const updates = {};
-      fullSnap.forEach(dateSnap => {
-        const date = dateSnap.key;
-        const daily = dateSnap.val();
-        const attendance = daily?.[gender];
-        if (Array.isArray(attendance)) {
-          const reordered = newList.map(name => {
-            const oldList = daily[gender];
-            const oldNamesRef = fullSnap.child("명단")?.val()?.[gender] || [];
-            const idx = oldNamesRef.indexOf(name);
-            return idx >= 0 ? oldList[idx] : false;
-          });
-          updates[`attendance/${department}/${date}/${gender}`] = reordered;
-        }
-      });
-      db.ref().update(updates).then(() => {
-        logMessage("드래그 순서가 저장되고 출석 정보도 업데이트되었습니다.");
-      });
-    });
-  });
-}
-
-// Init sortable
-document.addEventListener("DOMContentLoaded", () => {
-  new Sortable(nameList, {
-    animation: 150
-  });
-
-  document.getElementById("department").addEventListener("change", loadAndRenderNames);
-  document.getElementById("gender").addEventListener("change", loadAndRenderNames);
-});
-</script>
+  </script>
 </body>
 </html>
