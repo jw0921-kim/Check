@@ -206,7 +206,6 @@
         </style>
 </head>
 <body>
-<div id='debugLog' style='font-size: 0.85rem; padding: 6px; background: #fff3cd; color: #333; border: 1px solid #ffecb5; margin-bottom: 10px;'></div>
 <button class="back-btn" onclick="history.back()">← 뒤로가기</button>
 
 <h1>📋 겸손부</h1>
@@ -245,10 +244,6 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-function logDebug(msg) {
-  const el = document.getElementById("debugLog");
-  el.innerText += msg + "\n";
-}
 
     let brothers = [];
 let sisters = [];
@@ -297,28 +292,16 @@ let currentDate = new Date().toISOString().split("T")[0];
     }
 
     
-
 function fetchNames() {
   const namePath = "attendance/겸손부/명단";
   return db.ref(namePath).get().then(snap => {
     const data = snap.val() || {};
-    logDebug("📦 명단 불러옴");
-    brothers = Object.keys(data.형제 || {});
-    sisters = Object.keys(data.자매 || {});
-    logDebug("형제 수: " + brothers.length + " / 자매 수: " + sisters.length);
-  });
-    sisters = Object.keys(data.자매 || {});
-  });
-}
-
     brothers = data.형제 || [];
     sisters = data.자매 || [];
   });
 }
 
 function render() {
-  logDebug("🎨 render() 실행");
-
       brothersDiv.innerHTML = "";
       sistersDiv.innerHTML = "";
       brothers.forEach(name => brothersDiv.appendChild(createTag(name)));
@@ -333,38 +316,20 @@ function render() {
       sisCountEl.textContent = s ? `${s}명` : "";
     }
 
-    
-function saveToFirebase() {
-  const broAttendance = {};
-  const sisAttendance = {};
-  brothers.forEach((name, i) => {
-    broAttendance[name] = brothersDiv.children[i].classList.contains("present");
-  });
-  sisters.forEach((name, i) => {
-    sisAttendance[name] = sistersDiv.children[i].classList.contains("present");
-  });
-  db.ref("attendance/겸손부/" + currentDate).set({ 형제: broAttendance, 자매: sisAttendance });
-}
-);
+    function saveToFirebase() {
+      const bro = brothers.map((_, i) => brothersDiv.children[i].classList.contains("present"));
+      const sis = sisters.map((_, i) => sistersDiv.children[i].classList.contains("present"));
+      db.ref("attendance/겸손부/" + currentDate).set({ 형제: bro, 자매: sis });
     }
 
     
-    
-function listenToFirebase() {
-  logDebug("🔄 listenToFirebase 실행");
-  db.ref("attendance/겸손부/" + currentDate).on("value", snap => {
-    if (!snap.exists()) return updateSummary();
-    const data = snap.val();
-    brothers.forEach((name, i) => {
-      brothersDiv.children[i]?.classList.toggle("present", !!data.형제?.[name]);
-    });
-    sisters.forEach((name, i) => {
-      sistersDiv.children[i]?.classList.toggle("present", !!data.자매?.[name]);
-    });
-    updateSummary();
-  });
-}
-);
+    function listenToFirebase() {
+      db.ref("attendance/겸손부/" + currentDate).on("value", snap => {
+        if (!snap.exists()) return updateSummary();
+        const data = snap.val();
+        brothers.forEach((_, i) => {
+          brothersDiv.children[i]?.classList.toggle("present", !!data.형제?.[i]);
+        });
         sisters.forEach((_, i) => {
           sistersDiv.children[i]?.classList.toggle("present", !!data.자매?.[i]);
         });
@@ -372,18 +337,15 @@ function listenToFirebase() {
       });
     }
 
-
 function loadFromFirebase() {
-  render();
-  db.ref("attendance/겸손부/" + currentDate).get().then(snap => {
-    if (!snap.exists()) return updateSummary();
-    const data = snap.val();
-    if (data.형제) brothers.forEach((name, i) => brothersDiv.children[i]?.classList.toggle("present", !!data.형제[name]));
-    if (data.자매) sisters.forEach((name, i) => sistersDiv.children[i]?.classList.toggle("present", !!data.자매[name]));
-    updateSummary();
-  });
-}
-);
+      render();
+      db.ref("attendance/겸손부/" + currentDate).get().then(snap => {
+        if (!snap.exists()) return updateSummary();
+        const data = snap.val();
+        if (data.형제) data.형제.forEach((v,i) => brothersDiv.children[i]?.classList.toggle("present", v));
+        if (data.자매) data.자매.forEach((v,i) => sistersDiv.children[i]?.classList.toggle("present", v));
+        updateSummary();
+      });
     }
 
     function showToast(message) {
@@ -450,11 +412,7 @@ function loadFromFirebase() {
       defaultDate: currentDate,
       onChange: (_, dateStr) => {
         db.ref("attendance/겸손부/" + currentDate).off();
-        currentDate = dateStr;
-        fetchNames().then(() => {
-          render();
-          listenToFirebase();
-        });
+        render();
         
         currentDate = dateStr;
         fetchNames().then(() => { render(); listenToFirebase(); });
