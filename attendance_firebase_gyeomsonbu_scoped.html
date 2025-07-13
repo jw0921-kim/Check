@@ -206,6 +206,7 @@
         </style>
 </head>
 <body>
+<div id='debugLog' style='font-size: 0.85rem; padding: 6px; background: #fff3cd; color: #333; border: 1px solid #ffecb5; margin-bottom: 10px;'></div>
 <button class="back-btn" onclick="history.back()">← 뒤로가기</button>
 
 <h1>📋 겸손부</h1>
@@ -244,6 +245,10 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
+function logDebug(msg) {
+  const el = document.getElementById("debugLog");
+  el.innerText += msg + "\n";
+}
 
     let brothers = [];
 let sisters = [];
@@ -297,7 +302,11 @@ function fetchNames() {
   const namePath = "attendance/겸손부/명단";
   return db.ref(namePath).get().then(snap => {
     const data = snap.val() || {};
+    logDebug("📦 명단 불러옴");
     brothers = Object.keys(data.형제 || {});
+    sisters = Object.keys(data.자매 || {});
+    logDebug("형제 수: " + brothers.length + " / 자매 수: " + sisters.length);
+  });
     sisters = Object.keys(data.자매 || {});
   });
 }
@@ -308,6 +317,8 @@ function fetchNames() {
 }
 
 function render() {
+  logDebug("🎨 render() 실행");
+
       brothersDiv.innerHTML = "";
       sistersDiv.innerHTML = "";
       brothers.forEach(name => brothersDiv.appendChild(createTag(name)));
@@ -340,6 +351,7 @@ function saveToFirebase() {
     
     
 function listenToFirebase() {
+  logDebug("🔄 listenToFirebase 실행");
   db.ref("attendance/겸손부/" + currentDate).on("value", snap => {
     if (!snap.exists()) return updateSummary();
     const data = snap.val();
