@@ -292,10 +292,16 @@ let currentDate = new Date().toISOString().split("T")[0];
     }
 
     
+
 function fetchNames() {
   const namePath = "attendance/겸손부/명단";
   return db.ref(namePath).get().then(snap => {
     const data = snap.val() || {};
+    brothers = Object.keys(data.형제 || {});
+    sisters = Object.keys(data.자매 || {});
+  });
+}
+
     brothers = data.형제 || [];
     sisters = data.자매 || [];
   });
