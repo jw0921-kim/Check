@@ -316,6 +316,20 @@ function render() {
     }
 
     function saveToFirebase() {
+  const bro = {};
+  const sis = {};
+  brothers.forEach((name, i) => {
+    if (brothersDiv.children[i].classList.contains("present")) {
+      bro[name] = true;
+    }
+  });
+  sisters.forEach((name, i) => {
+    if (sistersDiv.children[i].classList.contains("present")) {
+      sis[name] = true;
+    }
+  });
+  db.ref("attendance/사랑부/" + currentDate).set({ 형제: bro, 자매: sis });
+}
       const bro = brothers.map((_, i) => brothersDiv.children[i].classList.contains("present"));
       const sis = sisters.map((_, i) => sistersDiv.children[i].classList.contains("present"));
       db.ref("attendance/사랑부/" + currentDate).set({ 형제: bro, 자매: sis });
@@ -323,6 +337,18 @@ function render() {
 
     
     function listenToFirebase() {
+  db.ref("attendance/사랑부/" + currentDate).on("value", snap => {
+    if (!snap.exists()) return updateSummary();
+    const data = snap.val();
+    brothers.forEach((name, i) => {
+      brothersDiv.children[i]?.classList.toggle("present", !!data.형제?.[name]);
+    });
+    sisters.forEach((name, i) => {
+      sistersDiv.children[i]?.classList.toggle("present", !!data.자매?.[name]);
+    });
+    updateSummary();
+  });
+}
       db.ref("attendance/사랑부/" + currentDate).on("value", snap => {
         if (!snap.exists()) return updateSummary();
         const data = snap.val();
@@ -337,6 +363,19 @@ function render() {
     }
 
 function loadFromFirebase() {
+  render();
+  db.ref("attendance/사랑부/" + currentDate).get().then(snap => {
+    if (!snap.exists()) return updateSummary();
+    const data = snap.val();
+    brothers.forEach((name, i) => {
+      brothersDiv.children[i]?.classList.toggle("present", !!data.형제?.[name]);
+    });
+    sisters.forEach((name, i) => {
+      sistersDiv.children[i]?.classList.toggle("present", !!data.자매?.[name]);
+    });
+    updateSummary();
+  });
+}
       render();
       db.ref("attendance/사랑부/" + currentDate).get().then(snap => {
         if (!snap.exists()) return updateSummary();
