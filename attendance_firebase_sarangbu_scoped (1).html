@@ -117,40 +117,28 @@
       border: 1px solid #f8bbd0;
     }
 
-    
-.name {
+    .name {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 7px;
-  text-align: center;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  padding: 6px 4px;
+      padding: 7px;
+      text-align: center;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.9rem;
+    }
 
-.name span {
-  display: inline-block;
-  max-width: 100%;
-  font-size: inherit;
-  transform: scaleX(1);
-  letter-spacing: -0.5px;
-}
-
-
-.name.present {
+    .name.present {
   transform: scale(1.03);
   transition: transform 0.2s ease;
   color: #2e7d32 !important;
-  background: #e6f4ea !important;
-  border: 2px solid #aed581;
-  font-weight: bold;
-  color: #33691e;
-}
+      background: #e6f4ea !important;
+      border: 2px solid #aed581;
+      font-weight: bold;
+      color: #33691e;
+    }
 
     .toast {
       position: fixed;
@@ -202,25 +190,25 @@
       box-sizing: border-box;
     }
     
-        .back-btn {
-          position: absolute;
-          top: 12px;
-          left: 12px;
-          background: #f3f7ff;
-          color: #37474f;
-          border: 1px solid #cfd8dc;
-          padding: 6px 12px;
-          font-size: 13px;
-          border-radius: 6px;
-          cursor: pointer;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        </style>
+    .back-btn {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: #f3f7ff;
+      color: #37474f;
+      border: 1px solid #cfd8dc;
+      padding: 6px 12px;
+      font-size: 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    </style>
 </head>
 <body>
 <button class="back-btn" onclick="history.back()">← 뒤로가기</button>
 
-<h1>📋 온유부</h1>
+<h1>📋 사랑부</h1>
 <div class="top-controls">
 <button id="prevDay">◀</button>
 <input id="datePicker" type="text"/>
@@ -293,7 +281,7 @@
     function createTag(name) {
       const div = document.createElement("div");
       div.className = "name";
-      div.innerHTML = `<span>${name}</span>`;
+      div.textContent = name;
       div.onclick = () => {
         pushUndoState();
         div.classList.toggle("present");
@@ -305,7 +293,7 @@
 
     
 function fetchNames() {
-  return db.ref("attendance/온유부/명단").get().then(snap => {
+  return db.ref("attendance/사랑부/명단").get().then(snap => {
     const data = snap.val() || {};
     brothers = data.형제 || [];
     sisters = data.자매 || [];
@@ -330,12 +318,12 @@ function render() {
     function saveToFirebase() {
       const bro = brothers.map((_, i) => brothersDiv.children[i].classList.contains("present"));
       const sis = sisters.map((_, i) => sistersDiv.children[i].classList.contains("present"));
-      db.ref("attendance/온유부/" + currentDate).set({ 형제: bro, 자매: sis });
+      db.ref("attendance/사랑부/" + currentDate).set({ 형제: bro, 자매: sis });
     }
 
     
     function listenToFirebase() {
-      db.ref("attendance/온유부/" + currentDate).on("value", snap => {
+      db.ref("attendance/사랑부/" + currentDate).on("value", snap => {
         if (!snap.exists()) return updateSummary();
         const data = snap.val();
         brothers.forEach((_, i) => {
@@ -350,7 +338,7 @@ function render() {
 
 function loadFromFirebase() {
       render();
-      db.ref("attendance/온유부/" + currentDate).get().then(snap => {
+      db.ref("attendance/사랑부/" + currentDate).get().then(snap => {
         if (!snap.exists()) return updateSummary();
         const data = snap.val();
         if (data.형제) data.형제.forEach((v,i) => brothersDiv.children[i]?.classList.toggle("present", v));
@@ -376,7 +364,7 @@ function loadFromFirebase() {
       const wd = ['일','월','화','수','목','금','토'][new Date(currentDate).getDay()];
       const bro = [...brothersDiv.children].filter(c => c.classList.contains("present")).map(c => c.textContent);
       const sis = [...sistersDiv.children].filter(c => c.classList.contains("present")).map(c => c.textContent);
-      const lines = [`${yy}.${mm}.${dd}(${wd}) 온유부 총 ${bro.length + sis.length}명`];
+      const lines = [`${yy}.${mm}.${dd}(${wd}) 사랑부 총 ${bro.length + sis.length}명`];
       lines.push(`형제님 ${bro.length}명`);
       for (let i=0; i<bro.length; i+=5) lines.push(bro.slice(i,i+5).join(" "));
       lines.push(``, `자매님 ${sis.length}명`);
@@ -409,7 +397,7 @@ function loadFromFirebase() {
     };
 
     function changeDate(offset) {
-      db.ref("attendance/온유부/" + currentDate).off();
+      db.ref("attendance/사랑부/" + currentDate).off();
       const d = new Date(currentDate);
       d.setDate(d.getDate() + offset);
       currentDate = d.toISOString().split("T")[0];
@@ -422,7 +410,7 @@ function loadFromFirebase() {
       dateFormat: "Y-m-d",
       defaultDate: currentDate,
       onChange: (_, dateStr) => {
-        db.ref("attendance/온유부/" + currentDate).off();
+        db.ref("attendance/사랑부/" + currentDate).off();
         render();
         
         currentDate = dateStr;
