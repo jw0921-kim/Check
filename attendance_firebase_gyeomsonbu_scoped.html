@@ -316,20 +316,37 @@ function render() {
       sisCountEl.textContent = s ? `${s}명` : "";
     }
 
-    function saveToFirebase() {
-      const bro = brothers.map((_, i) => brothersDiv.children[i].classList.contains("present"));
-      const sis = sisters.map((_, i) => sistersDiv.children[i].classList.contains("present"));
-      db.ref("attendance/겸손부/" + currentDate).set({ 형제: bro, 자매: sis });
+    
+function saveToFirebase() {
+  const broAttendance = {};
+  const sisAttendance = {};
+  brothers.forEach((name, i) => {
+    broAttendance[name] = brothersDiv.children[i].classList.contains("present");
+  });
+  sisters.forEach((name, i) => {
+    sisAttendance[name] = sistersDiv.children[i].classList.contains("present");
+  });
+  db.ref("attendance/겸손부/" + currentDate).set({ 형제: broAttendance, 자매: sisAttendance });
+}
+);
     }
 
     
-    function listenToFirebase() {
-      db.ref("attendance/겸손부/" + currentDate).on("value", snap => {
-        if (!snap.exists()) return updateSummary();
-        const data = snap.val();
-        brothers.forEach((_, i) => {
-          brothersDiv.children[i]?.classList.toggle("present", !!data.형제?.[i]);
-        });
+    
+function listenToFirebase() {
+  db.ref("attendance/겸손부/" + currentDate).on("value", snap => {
+    if (!snap.exists()) return updateSummary();
+    const data = snap.val();
+    brothers.forEach((name, i) => {
+      brothersDiv.children[i]?.classList.toggle("present", !!data.형제?.[name]);
+    });
+    sisters.forEach((name, i) => {
+      sistersDiv.children[i]?.classList.toggle("present", !!data.자매?.[name]);
+    });
+    updateSummary();
+  });
+}
+);
         sisters.forEach((_, i) => {
           sistersDiv.children[i]?.classList.toggle("present", !!data.자매?.[i]);
         });
@@ -337,15 +354,18 @@ function render() {
       });
     }
 
+
 function loadFromFirebase() {
-      render();
-      db.ref("attendance/겸손부/" + currentDate).get().then(snap => {
-        if (!snap.exists()) return updateSummary();
-        const data = snap.val();
-        if (data.형제) data.형제.forEach((v,i) => brothersDiv.children[i]?.classList.toggle("present", v));
-        if (data.자매) data.자매.forEach((v,i) => sistersDiv.children[i]?.classList.toggle("present", v));
-        updateSummary();
-      });
+  render();
+  db.ref("attendance/겸손부/" + currentDate).get().then(snap => {
+    if (!snap.exists()) return updateSummary();
+    const data = snap.val();
+    if (data.형제) brothers.forEach((name, i) => brothersDiv.children[i]?.classList.toggle("present", !!data.형제[name]));
+    if (data.자매) sisters.forEach((name, i) => sistersDiv.children[i]?.classList.toggle("present", !!data.자매[name]));
+    updateSummary();
+  });
+}
+);
     }
 
     function showToast(message) {
