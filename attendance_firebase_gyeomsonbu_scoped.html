@@ -438,7 +438,11 @@ function loadFromFirebase() {
       defaultDate: currentDate,
       onChange: (_, dateStr) => {
         db.ref("attendance/겸손부/" + currentDate).off();
-        render();
+        currentDate = dateStr;
+        fetchNames().then(() => {
+          render();
+          listenToFirebase();
+        });
         
         currentDate = dateStr;
         fetchNames().then(() => { render(); listenToFirebase(); });
